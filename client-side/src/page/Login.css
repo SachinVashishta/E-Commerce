@@ -1,0 +1,314 @@
+/* Pro Login Form - Admin Panel Style */
+:root {
+  --primary-gradient: linear-gradient(135deg, #667eea, #764ba2);
+  --border-radius: 20px;
+  --border-radius-sm: 12px;
+  --shadow-light: 0 20px 60px rgba(0,0,0,0.1);
+  --shadow-hover: 0 25px 70px rgba(0,0,0,0.15);
+  --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-fast: all 0.2s ease;
+  --text-dark: #1a202c;
+  --text-light: #718096;
+}
+
+.login-page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--primary-gradient);
+  position: relative;
+  padding: 2rem 1rem;
+  overflow: hidden;
+}
+
+.login-page::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: radial-gradient(circle at 20% 80%, rgba(120, 119, 198, 0.3) 0%, transparent 50%),
+              radial-gradient(circle at 80% 20%, rgba(255, 119, 198, 0.3) 0%, transparent 50%);
+  pointer-events: none;
+  animation: shimmer 8s ease-in-out infinite;
+}
+
+.login-container {
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(25px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: var(--border-radius);
+  box-shadow: var(--shadow-light);
+  padding: 3.5rem 3rem;
+  width: 100%;
+  max-width: 450px;
+  position: relative;
+  animation: fadeInUp 0.8s ease-out;
+  transition: var(--transition-smooth);
+}
+
+.login-container::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 5px;
+  background: var(--primary-gradient);
+  border-radius: var(--border-radius) var(--border-radius) 0 0;
+}
+
+.login-container:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-hover);
+}
+
+h1 {
+  text-align: center;
+  font-size: 2.5rem;
+  font-weight: 700;
+  background: var(--primary-gradient);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin-bottom: 2.5rem;
+  letter-spacing: -0.025em;
+}
+
+.form-group {
+  position: relative;
+  margin-bottom: 2rem;
+}
+
+.form-group input {
+  width: 100%;
+  padding: 1.25rem 1rem 1.25rem 3rem;
+  background: rgba(255, 255, 255, 0.5);
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-radius: var(--border-radius-sm);
+  font-size: 1rem;
+  color: var(--text-dark);
+  backdrop-filter: blur(10px);
+  transition: var(--transition-fast);
+  box-sizing: border-box;
+  outline: none;
+}
+
+.form-group input::placeholder {
+  color: transparent;
+}
+
+.form-group label {
+  position: absolute;
+  left: 3rem;
+  top: 1.25rem;
+  font-size: 1rem;
+  color: rgba(26, 32, 44, 0.7);
+  pointer-events: none;
+  transition: var(--transition-fast);
+  font-weight: 500;
+}
+
+.form-group input:focus + label,
+.form-group input:valid + label {
+  top: 0.5rem;
+  left: 2.5rem;
+  font-size: 0.875rem;
+  color: #4f46e5;
+  background: rgba(255, 255, 255, 0.9);
+  padding: 0 0.5rem;
+  border-radius: 8px;
+}
+
+.form-group input:focus,
+.form-group input:valid {
+  border-color: #4f46e5;
+  box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.1);
+  background: rgba(255, 255, 255, 0.7);
+}
+
+.form-icon {
+  position: absolute;
+  left: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 1.2rem;
+  color: rgba(26, 32, 44, 0.6);
+  transition: var(--transition-fast);
+}
+
+.form-group:has(input:focus) .form-icon,
+.form-group:has(input:valid) .form-icon {
+  color: #4f46e5;
+}
+
+.password-toggle {
+  position: absolute;
+  right: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  font-size: 1.25rem;
+  cursor: pointer;
+  color: rgba(26, 32, 44, 0.6);
+  transition: var(--transition-fast);
+  padding: 0.25rem;
+}
+
+.password-toggle:hover {
+  color: #4f46e5;
+  transform: translateY(-50%) scale(1.1);
+}
+
+button[type='submit'] {
+  width: 100%;
+  padding: 1.25rem;
+  background: var(--primary-gradient);
+  color: white;
+  border: none;
+  border-radius: var(--border-radius-sm);
+  font-size: 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition-smooth);
+  box-shadow: 0 10px 30px rgba(102, 126, 234, 0.35);
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  line-height: 1.3;
+}
+
+button[type='submit']:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 15px 40px rgba(102, 126, 234, 0.45);
+}
+
+button[type='submit']:disabled {
+  opacity: 0.8;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: 0 5px 15px rgba(102, 126, 234, 0.2);
+}
+
+.loading-spinner {
+  width: 22px;
+  height: 22px;
+  border: 2px solid rgba(255,255,255,0.3);
+  border-radius: 50%;
+  border-top-color: white;
+  animation: spin 1s ease-in-out infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.toggle-auth-container {
+  text-align: center;
+  margin: 2rem 0;
+  padding: 1rem;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: var(--border-radius-sm);
+  backdrop-filter: blur(10px);
+}
+
+.toggle-auth-container p {
+  margin: 0 0 0.5rem 0;
+  color: rgba(255, 255, 255, 0.9);
+  font-weight: 500;
+}
+
+.toggle-auth {
+  background: none;
+  border: none;
+  color: #4f46e5;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition-fast);
+  text-decoration: none;
+}
+
+.toggle-auth:hover {
+  text-shadow: 0 0 10px rgba(79, 70, 229, 0.5);
+}
+
+.error {
+  background: rgba(231, 76, 60, 0.15);
+  border: 1px solid rgba(231, 76, 60, 0.3);
+  color: #e74c3c;
+  padding: 1rem;
+  border-radius: var(--border-radius-sm);
+  margin: 1.5rem 0;
+  backdrop-filter: blur(10px);
+  animation: shake 0.5s ease-in-out;
+  font-weight: 500;
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-4px); }
+  75% { transform: translateX(4px); }
+}
+
+.demo-accounts {
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: var(--border-radius-sm);
+  padding: 1.5rem;
+  margin-top: 2rem;
+  text-align: center;
+  backdrop-filter: blur(10px);
+}
+
+.demo-accounts strong {
+  color: rgba(255, 255, 255, 0.95);
+  display: block;
+  margin-bottom: 0.5rem;
+  font-size: 1rem;
+}
+
+.demo-accounts p {
+  margin: 0.25rem 0;
+  color: rgba(255, 255, 255, 0.85);
+  font-size: 0.9rem;
+  font-weight: 500;
+  line-height: 1.4;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes shimmer {
+  0%, 100% { opacity: 0.6; }
+  50% { opacity: 1; }
+}
+
+@media (max-width: 480px) {
+  .login-container {
+    padding: 2.5rem 2rem;
+    margin: 1rem;
+  }
+  
+  h1 {
+    font-size: 2rem;
+  }
+  
+  .form-group {
+    margin-bottom: 1.75rem;
+  }
+}
+

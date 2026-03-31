@@ -1,0 +1,236 @@
+.amazon-product-detail {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+.amazon-back-btn {
+  background: linear-gradient(135deg, #232f3e 0%, #37475a 100%);
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  transition: all 0.2s;
+  margin-bottom: 24px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.amazon-back-btn:hover {
+  background: linear-gradient(135deg, #37475a 0%, #4a5568 100%);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px rgba(0,0,0,0.2);
+}
+
+.product-hero {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 40px;
+  margin-bottom: 40px;
+}
+
+.image-gallery {
+  position: relative;
+}
+
+.main-image {
+  width: 100%;
+  height: 500px;
+  object-fit: cover;
+  border-radius: 8px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+}
+
+.thumbs-container {
+  display: flex;
+  gap: 8px;
+  margin-top: 16px;
+}
+
+.thumb-image {
+  width: 80px;
+  height: 80px;
+  object-fit: cover;
+  border-radius: 4px;
+  cursor: pointer;
+  border: 2px solid transparent;
+  opacity: 0.7;
+  transition: all 0.2s;
+}
+
+.thumb-image:hover, .thumb-image.active {
+  opacity: 1;
+  border-color: #FF9900;
+}
+
+.product-info-section {
+  padding-left: 20px;
+}
+
+.product-title {
+  font-size: 28px;
+  font-weight: 600;
+  line-height: 1.2;
+  margin-bottom: 12px;
+  color: #111;
+}
+
+.rating-section {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 20px;
+}
+
+.stars {
+  display: flex;
+  gap: 2px;
+}
+
+.star {
+  color: #FFA41C;
+  font-size: 20px;
+}
+
+.rating-text {
+  font-size: 16px;
+  color: #111;
+  font-weight: 500;
+}
+
+.review-count {
+  font-size: 14px;
+  color: #56565A;
+  margin-left: 4px;
+}
+
+.price-section {
+  margin-bottom: 24px;
+}
+
+.deal-price {
+  font-size: 32px;
+  font-weight: 800;
+  color: #B12704;
+  margin-right: 12px;
+}
+
+.mrp-price {
+  font-size: 20px;
+  color: #56565A;
+  text-decoration: line-through;
+  margin-right: 12px;
+}
+
+.savings {
+  font-size: 18px;
+  color: #B12704;
+  font-weight: 600;
+}
+
+.stock-badge {
+  display: inline-block;
+  background: #00A651;
+  color: white;
+  padding: 4px 12px;
+  border-radius: 4px;
+  font-weight: 600;
+  font-size: 14px;
+  margin-top: 8px;
+}
+
+.out-of-stock-badge {
+  background: #D5D9D8;
+  color: #111;
+}
+
+.quantity-section {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.quantity-input {
+  width: 70px;
+  height: 40px;
+  border: 1px solid #E0E0E0;
+  border-radius: 4px;
+  text-align: center;
+  font-size: 18px;
+  font-weight: 500;
+}
+
+.add-to-cart-btn {
+  background: #FFD814;
+  color: #111;
+  border: 1px solid #D5D9D8;
+  padding: 16px 40px;
+  font-size: 18px;
+  font-weight: 600;
+  border-radius: 8px;
+  cursor: pointer;
+  min-width: 200px;
+  transition: all 0.2s;
+}
+
+.add-to-cart-btn:hover {
+  background: #F7DC6F;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+.add-to-cart-btn:disabled {
+  background: #E0E0E0;
+  cursor: not-allowed;
+}
+
+.product-desc {
+  font-size: 16px;
+  line-height: 1.5;
+  color: #111;
+  margin-bottom: 32px;
+}
+
+.product-details-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 32px;
+}
+
+.product-details-table th, .product-details-table td {
+  padding: 12px;
+  text-align: left;
+  border-bottom: 1px solid #E0E0E0;
+}
+
+.product-details-table th {
+  font-weight: 600;
+  color: #56565A;
+  font-size: 14px;
+}
+
+.product-details-table td {
+  font-size: 16px;
+  color: #111;
+}
+
+@media (max-width: 768px) {
+  .product-hero {
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+  
+  .product-title {
+    font-size: 24px;
+  }
+  
+  .deal-price {
+    font-size: 28px;
+  }
+}
