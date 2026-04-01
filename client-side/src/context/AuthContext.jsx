@@ -36,6 +36,7 @@ const API_URL = import.meta.env.VITE_API_URL;
     localStorage.setItem('token', res.data.token);
     axios.defaults.headers.common['Authorization'] = `Bearer ${res.data.token}`;
     setUser(res.data.user);
+    console.log(`${API_URL}/auth/login`, API_URL);
   };
 
 
@@ -44,6 +45,7 @@ const API_URL = import.meta.env.VITE_API_URL;
     localStorage.setItem('token', res.data.token);
     axios.defaults.headers.common['Authorization'] = `Bearer ${res.data.token}`;
     setUser(res.data.user);
+    console.log(`${API_URL}/auth/register`, API_URL);
   };
 
 
