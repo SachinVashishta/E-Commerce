@@ -8,7 +8,7 @@ const PaymentModal = ({ isOpen, onClose }) => {
   const { cartItems, clearCart, getTotalPrice } = useCart();
   const { user } = useAuth();
 
-  const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+const API_URL = import.meta.env.VITE_API_URL;
 
   const handlePayment = async () => {
     setLoading(true);
