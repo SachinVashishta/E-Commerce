@@ -13,9 +13,11 @@ export const AuthProvider = ({ children }) => {
     const token = localStorage.getItem('token');
     if (token) {
       axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+
       const fetchUser = async () => {
         try {
-          const res = await axios.get('http://localhost:5000/api/auth/profile');
+          const res = await axios.get(`${API_URL}/auth/profile`);
           setUser(res.data);
         } catch (err) {
           localStorage.removeItem('token');
@@ -23,24 +25,28 @@ export const AuthProvider = ({ children }) => {
           setUser(null);
         }
       };
+
       fetchUser();
     }
     setLoading(false);
   }, []);
 
   const login = async (email, password) => {
-    const res = await axios.post('http://localhost:5000/api/auth/login', { email, password });
+    const res = await axios.post(`${API_URL}/auth/login`, { email, password });
     localStorage.setItem('token', res.data.token);
     axios.defaults.headers.common['Authorization'] = `Bearer ${res.data.token}`;
     setUser(res.data.user);
   };
 
+
   const register = async (email, password) => {
-    const res = await axios.post('http://localhost:5000/api/auth/register', { email, password });
+    const res = await axios.post(`${API_URL}/auth/register`, { email, password });
     localStorage.setItem('token', res.data.token);
     axios.defaults.headers.common['Authorization'] = `Bearer ${res.data.token}`;
     setUser(res.data.user);
   };
+
+
 
   const logout = () => {
     localStorage.removeItem('token');

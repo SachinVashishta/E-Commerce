@@ -17,10 +17,12 @@ const Profile = () => {
     }
   }, [user]);
 
+  const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+
   const fetchProfile = async () => {
     try {
       setLoading(true);
-      const ordersRes = await axios.get('http://localhost:5000/api/orders/myorders', {
+      const ordersRes = await axios.get(`${API_URL}/orders/myorders`, {
         headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
       });
       setOrders(ordersRes.data);
@@ -39,6 +41,7 @@ const Profile = () => {
       setLoading(false);
     }
   };
+
 
   const handleLogout = () => {
     logout();

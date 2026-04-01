@@ -28,13 +28,15 @@ const AdminPanel = () => {
     }
   }, [user]);
 
+  const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+
   const fetchAdminData = async () => {
     try {
       const token = localStorage.getItem('token');
-      const usersRes = await axios.get('http://localhost:5000/api/admin/users', {
+      const usersRes = await axios.get(`${API_URL}/admin/users`, {
         headers: { Authorization: `Bearer ${token}` }
       });
-      const queriesRes = await axios.get('http://localhost:5000/api/admin/queries', {
+      const queriesRes = await axios.get(`${API_URL}/admin/queries`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setUsers(usersRes.data);
@@ -43,6 +45,7 @@ const AdminPanel = () => {
       console.error('Error:', error);
     }
   };
+
 
   const handleInputChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -69,7 +72,7 @@ const AdminPanel = () => {
       stock: parseInt(newProduct.stock) || 10
     };
     try {
-      await axios.post('http://localhost:5000/api/products', productData, {
+      await axios.post(`${API_URL}/products`, productData, {
         headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
       });
       showToast('✅ Product added successfully!', 'success');
@@ -91,6 +94,7 @@ const AdminPanel = () => {
       setLoading(false);
     }
   };
+
 
   if (user?.role !== 'admin') {
     return (

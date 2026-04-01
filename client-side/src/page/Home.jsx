@@ -11,12 +11,14 @@ const Home = () => {
   const [selectedCategory, setSelectedCategory] = useState('All');
 
   useEffect(() => {
+    const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+
     const fetchProducts = async () => {
       try {
         const params = {};
         if (selectedCategory !== 'All') params.category = selectedCategory;
         if (searchParams.get('search')) params.search = searchParams.get('search');
-        const res = await axios.get('http://localhost:5000/api/products', { params });
+        const res = await axios.get(`${API_URL}/products`, { params });
         setProducts(res.data);
       } catch (error) {
         console.error(error);
@@ -24,6 +26,7 @@ const Home = () => {
         setLoading(false);
       }
     };
+
     fetchProducts();
   }, [selectedCategory, searchParams]);
 
