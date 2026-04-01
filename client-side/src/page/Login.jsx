@@ -5,7 +5,7 @@ import './Login.css';
 
 const Login = () => {
   const [isLogin, setIsLogin] = useState(true);
-  const [formData, setFormData] = useState({ email: '', password: '' });
+  const [formData, setFormData] = useState({ name:'', email: '', password: '' });
   const [error, setError] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -22,7 +22,7 @@ const Login = () => {
         await login(formData.email, formData.password);
         navigate('/');
       } else {
-        await register(formData.email, formData.password);
+        await register(form.name,formData.email, formData.password);
         navigate('/');
       }
     } catch (err) {
@@ -42,6 +42,17 @@ const Login = () => {
         <h1>{isLogin ? 'Welcome Back' : 'Join Us'}</h1>
         
         <form onSubmit={handleSubmit}>
+            <div className="form-group">
+            <div className="form-icon">📧</div>
+            <input
+              type="name"
+              id="name"
+              value={formData.name}
+              onChange={(e) => setFormData({...formData, name: e.target.value})}
+              required
+            />
+            <label htmlFor="email">Email Address</label>
+          </div>
           <div className="form-group">
             <div className="form-icon">📧</div>
             <input
@@ -53,6 +64,7 @@ const Login = () => {
             />
             <label htmlFor="email">Email Address</label>
           </div>
+
           
           <div className="form-group">
             <div className="form-icon">🔒</div>
