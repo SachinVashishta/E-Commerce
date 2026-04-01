@@ -10,9 +10,11 @@ const seedData = async () => {
     // Seed Admin User (if not exists)
     let admin = await User.findOne({ email: 'admin@test.com' });
     if (!admin) {
+const bcrypt = require('bcryptjs');
+      const hashedPassword = await bcrypt.hash('admin123', 12);
       admin = new User({
         email: 'admin@test.com',
-        password: 'admin123',
+        password: hashedPassword,
         role: 'admin'
       });
       await admin.save();
