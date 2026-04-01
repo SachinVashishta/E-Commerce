@@ -21,7 +21,7 @@ app.use('/api/orders', require('./routes/orders'));
 
 
 // MongoDB Connection
-mongoose.connect(process.env.MONGODB_URI || 'mongodb+srv://sachinVashishtdb_user:<db_password>@cluster0.3o4awij.mongodb.net/?appName=Cluster0')
+mongoose.connect(process.env.MONGODB_URI || 'mongodb+srv://sachinVashishtdb_user:ShivShankar22@cluster0.3o4awij.mongodb.net/?appName=Cluster0')
 .then(() => console.log('MongoDB Connected'))
 .catch(err => console.log(err));
 
