@@ -17,13 +17,13 @@ exports.register = async (req, res) => {
 
 exports.login = async (req, res) => {
   try {
-    const { email, password } = req.body;
+    const { name, email, password } = req.body;
     const user = await User.findOne({ email });
     if (!user || !(await bcrypt.compare(password, user.password))) {
       return res.status(401).json({ message: 'Invalid credentials' });
     }
     const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET || 'simplekey', { expiresIn: '7d' });
-    res.json({ token, user: { id: user._id, email, role: user.role } });
+    res.json({ token, user: { id: user._id, name, email, role: user.role } });
   } catch (error) {
     res.status(500).json({ message: 'Server error' });
   }
