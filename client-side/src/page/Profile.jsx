@@ -22,7 +22,7 @@ const API_URL = import.meta.env.VITE_API_URL;
   const fetchProfile = async () => {
     try {
       setLoading(true);
-      const ordersRes = await axios.get(`${API_URL}/api/orders/myorders`, {
+      const ordersRes = await axios.get(`${API_URL}/orders/myorders`, {
         headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
       });
       setOrders(ordersRes.data);

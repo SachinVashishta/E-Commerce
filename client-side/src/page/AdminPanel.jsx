@@ -33,10 +33,10 @@ const API_URL = import.meta.env.VITE_API_URL;
   const fetchAdminData = async () => {
     try {
       const token = localStorage.getItem('token');
-      const usersRes = await axios.get(`${API_URL}/api/admin/users`, {
+      const usersRes = await axios.get(`${API_URL}/admin/users`, {
         headers: { Authorization: `Bearer ${token}` }
       });
-      const queriesRes = await axios.get(`${API_URL}/api/admin/queries`, {
+      const queriesRes = await axios.get(`${API_URL}/admin/queries`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setUsers(usersRes.data);
