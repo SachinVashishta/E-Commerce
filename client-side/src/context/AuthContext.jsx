@@ -1,6 +1,8 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import axios from 'axios';
 
+const API_URL = import.meta.env.VITE_API_URL;
+
 const AuthContext = createContext();
 
 export const useAuth = () => useContext(AuthContext);
@@ -13,7 +15,6 @@ export const AuthProvider = ({ children }) => {
     const token = localStorage.getItem('token');
     if (token) {
       axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-       const API_URL = import.meta.env.VITE_API_URL;
 
       const fetchUser = async () => {
         try {
@@ -32,31 +33,33 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
   const login = async (email, password) => {
-    const res = await axios.post(`${API_URL}/auth/login`, { email, password });
-    localStorage.setItem('token', res.data.token);
-    axios.defaults.headers.common['Authorization'] = `Bearer ${res.data.token}`;
-    setUser(res.data.user);
-    console.log(`${API_URL}/auth/login`, API_URL);
+    try {
+      const res = await axios.post(`${API_URL}/auth/login`, { email, password });
+      localStorage.setItem('token', res.data.token);
+      axios.defaults.headers.common['Authorization'] = `Bearer ${res.data.token}`;
+      setUser(res.data.user);
+    } catch (err) {
+      throw err; // Bubble to caller
+    }
   };
-
 
   const register = async (email, password) => {
-    const res = await axios.post(`${API_URL}/auth/register`, { email, password });
-    localStorage.setItem('token', res.data.token);
-    axios.defaults.headers.common['Authorization'] = `Bearer ${res.data.token}`;
-    setUser(res.data.user);
-    console.log(`${API_URL}/auth/register`, API_URL);
+    try {
+      const res = await axios.post(`${API_URL}/auth/register`, { email, password });
+      localStorage.setItem('token', res.data.token);
+      axios.defaults.headers.common['Authorization'] = `Bearer ${res.data.token}`;
+      setUser(res.data.user);
+    } catch (err) {
+      throw err;
+    }
   };
 
-
-
-  const logout = () => {
+  const logout = async () => {
     localStorage.removeItem('token');
     localStorage.removeItem('cart');
     delete axios.defaults.headers.common['Authorization'];
     setUser(null);
   };
-
 
   return (
     <AuthContext.Provider value={{ user, login, register, logout, loading }}>
