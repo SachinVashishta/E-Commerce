@@ -19,7 +19,7 @@ const Login = () => {
     
     try {
       if (isLogin) {
-        await login(formData.email, formData.password);
+        await login(form.name,formData.email, formData.password);
         navigate('/');
       } else {
         await register(form.name,formData.email, formData.password);
@@ -51,7 +51,7 @@ const Login = () => {
               onChange={(e) => setFormData({...formData, name: e.target.value})}
               required
             />
-            <label htmlFor="email">Email Address</label>
+            <label htmlFor="name">Name</label>
           </div>
           <div className="form-group">
             <div className="form-icon">📧</div>
