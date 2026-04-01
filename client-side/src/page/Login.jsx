@@ -98,7 +98,7 @@ const Login = () => {
         <div className="demo-accounts">
           <p><strong>Demo Accounts:</strong></p>
           <p>User: test@test.com / 123456</p>
-          <p>Admin: admin@5test.com / admin123</p>
+          <p>Admin: admin@test.com / admin123</p>
         </div>
       </div>
     </div>
