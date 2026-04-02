@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import axios from 'axios';
 import './AdminPanel.css';
+import '../styles/responsive.css';
 
 const AdminPanel = () => {
   const { user } = useAuth();
@@ -181,10 +182,10 @@ const API_URL = import.meta.env.VITE_API_URL;
 
       {/* Users */}
       <div className="pro-users-section">
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
-          <h2>👥 Users ({users.length})</h2>
+        <div className="flex flex-col sm:flex-row justify-between items-center gap-4 mb-8">
+          <h2 className="text-2xl font-bold">👥 Users ({users.length})</h2>
         </div>
-        <div style={{ display: 'grid', gap: '1rem' }}>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {users.map(u => (
             <div key={u._id} className="user-item">
               <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
@@ -205,10 +206,10 @@ const API_URL = import.meta.env.VITE_API_URL;
 
       {/* Queries */}
       <div className="pro-queries-section">
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
-          <h2>💬 Queries ({queries.length})</h2>
+        <div className="flex flex-col sm:flex-row justify-between items-center gap-4 mb-8">
+          <h2 className="text-2xl font-bold">💬 Queries ({queries.length})</h2>
         </div>
-        <div style={{ display: 'grid', gap: '1rem' }}>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {queries.map(q => (
             <div key={q._id} className="query-item">
               <div>
