@@ -61,6 +61,12 @@ const API_URL = import.meta.env.VITE_API_URL;
         >
           Books
         </button>
+          <button 
+          className={`category-btn ${selectedCategory === 'Sports' ? 'active' : ''}`}
+          onClick={() => setSelectedCategory('Sports')}
+        >
+          Sports
+        </button>
       </div>
 
       <div className="products-grid">
