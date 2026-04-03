@@ -21,7 +21,7 @@ const AdminPanel = () => {
   const [imagePreview, setImagePreview] = useState('');
   const [loading, setLoading] = useState(false);
   const [toast, setToast] = useState({ message: '', type: '' });
-  const categories = ['Electronics', 'Clothing', 'Books', 'Sports', 'Home'];
+  const categories = ['Electronics', 'Clothing', 'Books', 'Sports', 'Kitchen', 'Toys', 'Beauty'];
 
   useEffect(() => {
     if (user?.role === 'admin') {
