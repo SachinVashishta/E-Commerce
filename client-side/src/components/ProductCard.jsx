@@ -17,6 +17,9 @@ const ProductCard = ({ product }) => {
       'Electronics': '#FF9900',
       'Clothing': '#00A651',
       'Books': '#FF8F00',
+      'Kitchen': '#FFD966',
+      'Toys': '#FFD966',
+       'Beauty': '#E6A4B4',
       'default': '#232F3E'
     };
     return colors[category] || colors.default;
