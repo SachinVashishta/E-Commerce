@@ -1,33 +1,80 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useCart } from '../context/CardContext';
+import { useAuth } from '../context/AuthContext';
 import axios from 'axios';
 import './ProductDetails.css';
 
 const ProductDetail = () => {
+  const {user}=useAuth()
   const { id } = useParams();
   const navigate = useNavigate();
   const { addToCart, error: cartError } = useCart();
   const [quantity, setQuantity] = useState(1);
   const [successMsg, setSuccessMsg] = useState('');
   const [product, setProduct] = useState(null);
-  const [loading, setLoading] = useState(true);
+const [loading, setLoading] = useState(true);
+  // Admin edit states
+  const [editForm, setEditForm] = useState({});
+const [adminMsg, setAdminMsg] = useState('');
 
 const API_URL = import.meta.env.VITE_API_URL;
 
+// Load product data for admin form
+useEffect(() => {
+  if (product) {
+    setEditForm({
+      title: product.title,
+      description: product.description,
+      price: product.price,
+      stock: product.stock
+    });
+  }
+}, [product]);
+
+// Fetch product
+const fetchProduct = async () => {
+  try {
+    const res = await axios.get(`${API_URL}/products/${id}`);
+    setProduct(res.data);
+    setAdminMsg('');
+  } catch (error) {
+    console.error('Error fetching product:', error);
+    setAdminMsg('Error loading product');
+  } finally {
+    setLoading(false);
+  }
+};
+
+// Update handler (admin)
+const handleUpdate = async () => {
+  try {
+    const res = await axios.put(`${API_URL}/products/${id}`, editForm);
+    setProduct(res.data);
+    setAdminMsg('✅ Product updated successfully!');
+    setTimeout(() => setAdminMsg(''), 3000);
+  } catch (error) {
+    setAdminMsg('❌ Update failed: ' + (error.response?.data?.message || error.message));
+  }
+};
+
+// Delete handler (admin)
+const handleDelete = async () => {
+  if (window.confirm('Are you sure you want to delete this product?')) {
+    try {
+      await axios.delete(`${API_URL}/products/${id}`);
+      setAdminMsg('🗑️ Product deleted!');
+      setTimeout(() => navigate('/'), 1500);
+    } catch (error) {
+      setAdminMsg('❌ Delete failed: ' + (error.response?.data?.message || error.message));
+    }
+  }
+};
+
   useEffect(() => {
-    const fetchProduct = async () => {
-      try {
-        const res = await axios.get(`${API_URL}/products/${id}`);
-        setProduct(res.data);
-      } catch (error) {
-        console.error('Error fetching product:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
     fetchProduct();
   }, [id]);
+
 
 
   const handleAddToCart = async () => {
@@ -138,10 +185,85 @@ const API_URL = import.meta.env.VITE_API_URL;
               </tr>
             </tbody>
           </table>
+
+          {/* Admin Controls - only visible to admin */}
+          {user?.role === 'admin' && (
+            <div className="admin-section" style={{marginTop: '20px', padding: '20px', border: '1px solid #ddd', borderRadius: '8px', background: '#f9f9f9'}}>
+              <h3 style={{color: '#667eea', marginBottom: '15px'}}>⚙️ Admin Controls</h3>
+              
+              {/* Simple form for update */}
+              <div style={{marginBottom: '15px'}}>
+                <input
+                  style={{width: '100%', padding: '8px', marginBottom: '10px', border: '1px solid #ccc', borderRadius: '4px'}}
+                  placeholder="Title"
+                  value={editForm.title || ''}
+                  onChange={(e) => setEditForm({...editForm, title: e.target.value})}
+                />
+                <textarea
+                  style={{width: '100%', padding: '8px', marginBottom: '10px', border: '1px solid #ccc', borderRadius: '4px', resize: 'vertical'}}
+                  placeholder="Description"
+                  value={editForm.description || ''}
+                  onChange={(e) => setEditForm({...editForm, description: e.target.value})}
+                  rows="3"
+                />
+                <div style={{display: 'flex', gap: '10px'}}>
+                  <input
+                    style={{flex: 1, padding: '8px', border: '1px solid #ccc', borderRadius: '4px'}}
+                    type="number"
+                    placeholder="Price"
+                    value={editForm.price || ''}
+                    onChange={(e) => setEditForm({...editForm, price: parseFloat(e.target.value) || 0})}
+                  />
+                  <input
+                    style={{flex: 1, padding: '8px', border: '1px solid #ccc', borderRadius: '4px'}}
+                    type="number"
+                    placeholder="Stock"
+                    value={editForm.stock || ''}
+                    onChange={(e) => setEditForm({...editForm, stock: parseInt(e.target.value) || 0})}
+                  />
+                  <input
+                    style={{flex: 1, padding: '8px', border: '1px solid #ccc', borderRadius: '4px'}}
+                    type="url"
+                    placeholder="Image URL"
+                    value={editForm.image || product.image || ''}
+                    onChange={(e) => setEditForm({...editForm, image: e.target.value})}
+                  />
+                </div>
+              </div>
+
+
+              {/* Buttons */}
+              <div style={{display: 'flex', gap: '10px'}}>
+                <button 
+                  style={{flex: 1, padding: '12px', background: '#28a745', color: 'white', border: 'none', borderRadius: '6px', cursor: 'pointer', fontWeight: 'bold'}}
+                  onClick={handleUpdate}
+                >
+                  💾 Update Product
+                </button>
+                <button 
+                  style={{flex: 1, padding: '12px', background: '#dc3545', color: 'white', border: 'none', borderRadius: '6px', cursor: 'pointer', fontWeight: 'bold'}}
+                  onClick={handleDelete}
+                >
+                  🗑️ Delete Product
+                </button>
+              </div>
+
+              {/* Admin message */}
+              {adminMsg && (
+                <p style={{marginTop: '10px', padding: '10px', borderRadius: '4px', fontWeight: 'bold', textAlign: 'center'}}>
+                  {adminMsg.includes('success') || adminMsg.includes('✅') || adminMsg.includes('🗑️') 
+                    ? `✅ ${adminMsg}` 
+                    : `❌ ${adminMsg}`
+                  }
+                </p>
+              )}
+            </div>
+          )}
         </div>
       </div>
     </div>
   );
 };
+
 
 export default ProductDetail;
