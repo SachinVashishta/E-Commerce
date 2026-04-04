@@ -1,5 +1,5 @@
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate ,Link} from 'react-router-dom';
 import { useCart } from '../context/CardContext';
 import './ProductCard.css';
 
@@ -66,9 +66,9 @@ const ProductCard = ({ product }) => {
       <div className="card-actions">
         
          {inCart ? (
-             <button className="out-of-stock-btn" onClick={()=> navigate('/cart')} >
+             <Link to='/cart' className="out-of-stock-btn"  >
             Go To Cart
-          </button>
+          </Link>
           ):(
           <button className="add-cart-btn" onClick={handleAddToCart}>
             Add to Cart
