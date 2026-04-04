@@ -6,7 +6,7 @@ import './ProductCard.css';
 const ProductCard = ({ product }) => {
   const navigate = useNavigate();
   const { addToCart } = useCart();
-
+  const inCart = useCart().cartItems.some(item => item.product._id === product._id);
   const handleAddToCart = async (e) => {
     e.stopPropagation();
     await addToCart(product);
@@ -64,15 +64,16 @@ const ProductCard = ({ product }) => {
       </div>
 
       <div className="card-actions">
-        {product.stock > 0 ? (
+        
+          inCart ? (
+             <button className="out-of-stock-btn" onClick={()=> navigate('/cart')} >
+            Go To Cart
+          </button>
+          ):(
           <button className="add-cart-btn" onClick={handleAddToCart}>
             Add to Cart
           </button>
-        ) : (
-          <button className="out-of-stock-btn" onClick={()=> navigate('/cart')} >
-            G To Cart
-          </button>
-        )}
+        )  
       </div>
     </div>
   );
