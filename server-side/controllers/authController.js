@@ -9,7 +9,7 @@ exports.register = async (req, res) => {
     const user = new User({  email, password: hashedPassword });
     await user.save();
     const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET || 'simplekey', { expiresIn: '7d' });
-    res.json({ token, user: { id: user._id,  email, role: user.role } });
+    res.json({ token, user: { id: user._id,  email, role: user.role , createdAt: user.createdAt,} });
   } catch (error) {
     res.status(400).json({ message: error.message });
   }
@@ -23,7 +23,7 @@ exports.login = async (req, res) => {
       return res.status(401).json({ message: 'Invalid credentials' });
     }
     const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET || 'simplekey', { expiresIn: '7d' });
-    res.json({ token, user: { id: user._id, email, role: user.role } });
+    res.json({ token, user: { id: user._id, email, role: user.role ,  createdAt: user.createdAt, } });
   } catch (error) {
     res.status(500).json({ message: 'Server error' });
   }
