@@ -166,7 +166,7 @@
   background: #F7F7F7;
   color: #999;
   border: 1px solid #E0E0E0;
-  cursor: not-allowed;
+  cursor: pointer;
 }
 
 /* Responsive */

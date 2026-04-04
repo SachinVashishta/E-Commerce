@@ -65,7 +65,7 @@ const ProductCard = ({ product }) => {
 
       <div className="card-actions">
         
-          inCart ? (
+         {inCart ? (
              <button className="out-of-stock-btn" onClick={()=> navigate('/cart')} >
             Go To Cart
           </button>
@@ -73,7 +73,7 @@ const ProductCard = ({ product }) => {
           <button className="add-cart-btn" onClick={handleAddToCart}>
             Add to Cart
           </button>
-        )  
+        )}
       </div>
     </div>
   );
