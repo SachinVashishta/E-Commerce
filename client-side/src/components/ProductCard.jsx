@@ -6,7 +6,7 @@ import './ProductCard.css';
 const ProductCard = ({ product }) => {
   const navigate = useNavigate();
   const { addToCart } = useCart();
-  const inCart = useCart().cartItems.filter(item => item.product.id === product.id).length > 0;
+  const inCart = useCart().cartItems.filter(item => item._id === product._id).length > 0;
   const handleAddToCart = async (e) => {
     e.stopPropagation();
     await addToCart(product);
