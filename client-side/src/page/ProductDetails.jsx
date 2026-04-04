@@ -16,7 +16,9 @@ const ProductDetail = () => {
 const [loading, setLoading] = useState(true);
   // Admin edit states
   const [editForm, setEditForm] = useState({});
-const [adminMsg, setAdminMsg] = useState('');
+  const [adminMsg, setAdminMsg] = useState('');
+  const [isEditing, setIsEditing] = useState(false);
+
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -186,75 +188,87 @@ const handleDelete = async () => {
             </tbody>
           </table>
 
-          {/* Admin Controls - only visible to admin */}
+          {/* Admin Controls - Edit toggle */}
           {user?.role === 'admin' && (
             <div className="admin-section" style={{marginTop: '20px', padding: '20px', border: '1px solid #ddd', borderRadius: '8px', background: '#f9f9f9'}}>
-              <h3 style={{color: '#667eea', marginBottom: '15px'}}>⚙️ Admin Controls</h3>
-              
-              {/* Simple form for update */}
-              <div style={{marginBottom: '15px'}}>
-                <input
-                  style={{width: '100%', padding: '8px', marginBottom: '10px', border: '1px solid #ccc', borderRadius: '4px'}}
-                  placeholder="Title"
-                  value={editForm.title || ''}
-                  onChange={(e) => setEditForm({...editForm, title: e.target.value})}
-                />
-                <textarea
-                  style={{width: '100%', padding: '8px', marginBottom: '10px', border: '1px solid #ccc', borderRadius: '4px', resize: 'vertical'}}
-                  placeholder="Description"
-                  value={editForm.description || ''}
-                  onChange={(e) => setEditForm({...editForm, description: e.target.value})}
-                  rows="3"
-                />
-                <div style={{display: 'flex', gap: '10px'}}>
-                  <input
-                    style={{flex: 1, padding: '8px', border: '1px solid #ccc', borderRadius: '4px'}}
-                    type="number"
-                    placeholder="Price"
-                    value={editForm.price || ''}
-                    onChange={(e) => setEditForm({...editForm, price: parseFloat(e.target.value) || 0})}
-                  />
-                  <input
-                    style={{flex: 1, padding: '8px', border: '1px solid #ccc', borderRadius: '4px'}}
-                    type="number"
-                    placeholder="Stock"
-                    value={editForm.stock || ''}
-                    onChange={(e) => setEditForm({...editForm, stock: parseInt(e.target.value) || 0})}
-                  />
-                  <input
-                    style={{flex: 1, padding: '8px', border: '1px solid #ccc', borderRadius: '4px'}}
-                    type="url"
-                    placeholder="Image URL"
-                    value={editForm.image || product.image || ''}
-                    onChange={(e) => setEditForm({...editForm, image: e.target.value})}
-                  />
+              {!isEditing ? (
+                <button 
+                  style={{width: '100%', padding: '12px', background: '#007bff', color: 'white', border: 'none', borderRadius: '6px', cursor: 'pointer', fontWeight: 'bold'}}
+                  onClick={() => setIsEditing(true)}
+                >
+                  ✏️ Edit Product
+                </button>
+              ) : (
+                <div>
+                  <h3 style={{color: '#667eea', marginBottom: '15px'}}>Edit Product</h3>
+                  
+                  {/* Edit form - editable fields */}
+                  <div style={{marginBottom: '15px'}}>
+                    <input
+                      style={{width: '100%', padding: '8px', marginBottom: '10px', border: '1px solid #ccc', borderRadius: '4px'}}
+                      placeholder="Title"
+                      value={editForm.title || ''}
+                      onChange={(e) => setEditForm({...editForm, title: e.target.value})}
+                    />
+                    <textarea
+                      style={{width: '100%', padding: '8px', marginBottom: '10px', border: '1px solid #ccc', borderRadius: '4px', resize: 'vertical'}}
+                      placeholder="Description"
+                      value={editForm.description || ''}
+                      onChange={(e) => setEditForm({...editForm, description: e.target.value})}
+                      rows="3"
+                    />
+                    <div style={{display: 'flex', gap: '10px'}}>
+                      <input
+                        style={{flex: 1, padding: '8px', border: '1px solid #ccc', borderRadius: '4px'}}
+                        type="number"
+                        placeholder="Price"
+                        value={editForm.price || ''}
+                        onChange={(e) => setEditForm({...editForm, price: parseFloat(e.target.value) || 0})}
+                      />
+                      <input
+                        style={{flex: 1, padding: '8px', border: '1px solid #ccc', borderRadius: '4px'}}
+                        type="number"
+                        placeholder="Stock"
+                        value={editForm.stock || ''}
+                        onChange={(e) => setEditForm({...editForm, stock: parseInt(e.target.value) || 0})}
+                      />
+                      <input
+                        style={{flex: 1, padding: '8px', border: '1px solid #ccc', borderRadius: '4px'}}
+                        type="url"
+                        placeholder="Image URL"
+                        value={editForm.image || product.image || ''}
+                        onChange={(e) => setEditForm({...editForm, image: e.target.value})}
+                      />
+                    </div>
+                  </div>
+
+                  {/* Action buttons */}
+                  <div style={{display: 'flex', gap: '10px'}}>
+                    <button 
+                      style={{flex: 1, padding: '12px', background: '#28a745', color: 'white', border: 'none', borderRadius: '6px', cursor: 'pointer', fontWeight: 'bold'}}
+                      onClick={handleUpdate}
+                    >
+                      💾 Update
+                    </button>
+                    <button 
+                      style={{flex: 1, padding: '12px', background: '#dc3545', color: 'white', border: 'none', borderRadius: '6px', cursor: 'pointer', fontWeight: 'bold'}}
+                      onClick={handleDelete}
+                    >
+                      🗑️ Delete
+                    </button>
+                    <button 
+                      style={{flex: 1, padding: '12px', background: '#6c757d', color: 'white', border: 'none', borderRadius: '6px', cursor: 'pointer'}}
+                      onClick={() => setIsEditing(false)}
+                    >
+                      Cancel
+                    </button>
+                  </div>
                 </div>
-              </div>
+              )}
 
-
-              {/* Buttons */}
-              <div style={{display: 'flex', gap: '10px'}}>
-                <button 
-                  style={{flex: 1, padding: '12px', background: '#28a745', color: 'white', border: 'none', borderRadius: '6px', cursor: 'pointer', fontWeight: 'bold'}}
-                  onClick={handleUpdate}
-                >
-                  💾 Update Product
-                </button>
-                <button 
-                  style={{flex: 1, padding: '12px', background: '#dc3545', color: 'white', border: 'none', borderRadius: '6px', cursor: 'pointer', fontWeight: 'bold'}}
-                  onClick={handleDelete}
-                >
-                  🗑️ Delete Product
-                </button>
-              </div>
-
-              {/* Admin message */}
               {adminMsg && (
                 <p style={{marginTop: '10px', padding: '10px', borderRadius: '4px', fontWeight: 'bold', textAlign: 'center'}}>
-                  {adminMsg.includes('success') || adminMsg.includes('✅') || adminMsg.includes('🗑️') 
-                    ? `✅ ${adminMsg}` 
-                    : `❌ ${adminMsg}`
-                  }
+                  {adminMsg.includes('success') || adminMsg.includes('✅') || adminMsg.includes('🗑️') ? '✅ ' + adminMsg : '❌ ' + adminMsg}
                 </p>
               )}
             </div>
@@ -264,6 +278,7 @@ const handleDelete = async () => {
     </div>
   );
 };
+
 
 
 export default ProductDetail;
