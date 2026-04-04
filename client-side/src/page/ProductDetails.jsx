@@ -41,7 +41,7 @@ const API_URL = import.meta.env.VITE_API_URL;
   };
 
   const rating = Math.round(product?.rating || 4.5);
-  const reviewsCount = 128; // hardcoded for demo
+  const reviewsCount = 128; 
   const savings = product?.originalPrice ? Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100) : 0;
 
   if (loading) return <div className="loading amazon-loading">Loading product details...</div>;

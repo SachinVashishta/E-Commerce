@@ -69,8 +69,8 @@ const ProductCard = ({ product }) => {
             Add to Cart
           </button>
         ) : (
-          <button className="out-of-stock-btn" disabled>
-            Out of Stock
+          <button className="out-of-stock-btn" onClick={()=> navigate('/cart')} >
+            G To Cart
           </button>
         )}
       </div>
