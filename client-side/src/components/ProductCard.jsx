@@ -66,7 +66,7 @@ const ProductCard = ({ product }) => {
       <div className="card-actions">
         
          {inCart ? (
-             <Link to='/cart' className="add-cart-btn"  >
+             <Link to='/cart' className="add-cart-btn" style={{textDecoration:'none'}} >
             Go To Cart
           </Link>
           ):(
