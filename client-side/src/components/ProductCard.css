@@ -140,7 +140,7 @@
   margin-top: auto;
 }
 
-.add-cart-btn, .out-of-stock-btn {
+.add-cart-btn  {
   width: 100%;
   padding: 12px;
   border: none;
@@ -150,6 +150,18 @@
   cursor: pointer;
   transition: all 0.2s;
 }
+
+.go-to-cart  {
+  width: 100%;
+  padding: 12px;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
 
 .add-cart-btn {
   background: #FF9900;
@@ -162,7 +174,7 @@
   box-shadow: 0 4px 12px rgba(255,153,0,0.3);
 }
 
-.out-of-stock-btn {
+.go-to-cart {
   background: #F7F7F7;
   color: #999;
   border: 1px solid #E0E0E0;
