@@ -19,25 +19,37 @@ module.exports = (io) => {
     // Send message
     socket.on("sendMessage", async ({ senderId, receiverId, text }) => {
       try {
-        console.log(`Message from ${senderId}: ${text}`);
+        // ✅ Input validation
+        if (!senderId || !receiverId || !text || text.trim().length === 0 || text.length > 500) {
+          return socket.emit("messageSent", { 
+            text: "Invalid message. Keep it under 500 chars.", 
+            senderId, 
+            receiverId 
+          });
+        }
+
+        const cleanText = text.trim();
+        console.log(`Message from ${senderId}: ${cleanText}`);
         
-        // Save user message (adminId as string ok, Mongo stores as ObjectId or string)
+        // Save user message
         const userMessage = await Message.create({
           senderId,
           receiverId,
-          text
+          text: cleanText
         });
 
-        // Send to receiver
+        // Send back to sender
+        socket.emit("messageSent", userMessage);
+
+        // Send to receiver if online
         const receiverSocket = users[receiverId];
         if (receiverSocket) {
           io.to(receiverSocket).emit("receiveMessage", userMessage);
         }
-        socket.emit("messageSent", userMessage);
 
-        // AI auto-reply if not from admin
+        // ✅ AI auto-reply (simple, non-admin only)
         if (senderId !== "admin") {
-          const aiText = await generateAIResponse(text);
+          const aiText = await generateAIResponse(cleanText);
           const aiMessage = await Message.create({
             senderId: "admin",
             receiverId: senderId,
@@ -48,12 +60,16 @@ module.exports = (io) => {
           if (receiverSocket) {
             io.to(receiverSocket).emit("receiveMessage", aiMessage);
           }
-          console.log(`AI replied to ${senderId}`);
+          console.log(`✅ AI replied to ${senderId}`);
         }
 
       } catch (err) {
         console.error("ChatSocket error:", err);
-        socket.emit("messageSent", { text: "Sorry, try again.", senderId, receiverId });
+        socket.emit("messageSent", { 
+          text: "Server error, please try again.", 
+          senderId, 
+          receiverId 
+        });
       }
     });
 

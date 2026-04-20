@@ -1,16 +1,10 @@
 import { useEffect, useState, useRef, useCallback } from "react";
 import { useAuth } from "../context/AuthContext";
-import {io} from "socket.io-client";
+import { io } from "socket.io-client";
 import axios from "axios";
 import './Chat.css';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
-const socket = API_URL === 'http://localhost:5000' ? io(API_URL) : io("https://e-commerce-47.onrender.com", {
-  transports: ["websocket"],   // force websocket
-  withCredentials: true,
-  reconnection: true,
-  reconnectionAttempts: 5
-});
 
 export default function Chat() {
   const { user } = useAuth();
@@ -20,10 +14,40 @@ export default function Chat() {
   const [error, setError] = useState(null);
   const [isTyping, setIsTyping] = useState(false);
   const messagesEndRef = useRef(null);
-  const ADMIN_ID = "admin"; // Hardcoded admin ID
+  const socketRef = useRef(null);
 
   const userId = user?._id || "guest";
-  const adminId = ADMIN_ID;
+  const adminId = "admin";
+
+  // ✅ Local socket connection with cleanup
+  useEffect(() => {
+    if (!userId) return;
+
+    const socket = io(API_URL, {
+      transports: ["websocket", "polling"],
+      withCredentials: true,
+      reconnection: true,
+      reconnectionAttempts: 5
+    });
+    socketRef.current = socket;
+
+    // Join room
+    socket.emit("join", { userId });
+
+    // Receive messages
+    const handleReceive = (msg) => {
+      setMessages((prev) => [...prev, msg]);
+      setIsTyping(false);
+    };
+    socket.on("receiveMessage", handleReceive);
+    socket.on("messageSent", handleReceive);
+
+    return () => {
+      socket.off("receiveMessage", handleReceive);
+      socket.off("messageSent", handleReceive);
+      socket.disconnect();
+    };
+  }, [userId, API_URL]);
 
   // Scroll to bottom
   const scrollToBottom = useCallback(() => {
@@ -34,56 +58,34 @@ export default function Chat() {
     scrollToBottom();
   }, [messages, scrollToBottom]);
 
-  // Join room
+  // Load initial messages
   useEffect(() => {
-    if (userId) {
-      socket.emit("join", { userId });
-    }
-  }, [userId]);
+    if (!userId) return;
 
-  // Load messages
-  useEffect(() => {
-    if (userId) {
-      setLoading(true);
-      axios.get(`${API_URL}/messages/${userId}`)
-        .then((res) => {
-          setMessages(res.data || []);
-          setError(null);
-        })
-        .catch((err) => {
-          console.error("Load messages error:", err);
-          setError("Failed to load messages");
-        })
-        .finally(() => setLoading(false));
-    }
+    setLoading(true);
+    axios.get(`${API_URL}/api/messages/${userId}`)
+      .then((res) => {
+        setMessages(res.data || []);
+        setError(null);
+      })
+      .catch((err) => {
+        console.error("Load messages error:", err);
+        setError("Failed to load messages");
+      })
+      .finally(() => setLoading(false));
   }, [userId, API_URL]);
-
-  // Receive message
-  useEffect(() => {
-  const handleReceive = (msg) => {
-    setMessages((prev) => [...prev, msg]);
-    setIsTyping(false);
-  };
-    socket.on("receiveMessage", handleReceive);
-    socket.on("messageSent", handleReceive);
-
-    return () => {
-      socket.off("receiveMessage", handleReceive);
-      socket.off("messageSent", handleReceive);
-    };
-  }, []);
 
   const sendMessage = (e) => {
     e.preventDefault();
-    if (!text.trim() || !userId) return;
+    if (!text.trim() || !userId || !socketRef.current) return;
 
     const messageData = {
       senderId: userId,
       receiverId: adminId,
-      text: text.trim(),
+      text: text.trim()
     };
 
-    socket.emit("sendMessage", messageData);
+    socketRef.current.emit("sendMessage", messageData);
     setText("");
     setIsTyping(true);
   };
@@ -95,18 +97,20 @@ export default function Chat() {
   return (
     <div className="chat-container">
       <div className="chat-header">
-        <h2>💬 Support Chat</h2>
-        <p>with Admin</p>
+        <h2>💬 AI Support Chat</h2>
+        <p>Ask anything about products, orders, or support!</p>
       </div>
 
       <div className="chat-messages">
         {loading && <div className="loading">Loading messages...</div>}
-{error && <div className="error">{error}</div>}
+        {error && <div className="error">{error}</div>}
+        
         {isTyping && (
           <div className="message received">
             <div>🤖 AI is typing...</div>
           </div>
         )}
+        
         {messages.map((msg, i) => (
           <div
             key={msg._id || i}
@@ -126,9 +130,10 @@ export default function Chat() {
           className="chat-input"
           value={text}
           onChange={(e) => setText(e.target.value)}
-          placeholder="Type your message... (Enter to send)"
+          placeholder="Type your question... (Enter to send)"
           rows="1"
           disabled={loading}
+          maxLength={500}
         />
         <button
           type="submit"
@@ -141,3 +146,4 @@ export default function Chat() {
     </div>
   );
 }
+

@@ -3,24 +3,18 @@ const User = require('../models/User');
 const { generateAIResponse } = require('./aiController');
 
 // ✅ Get messages (user ↔ admin)
-const getMessages = async (req, res) => {
+const getMessages = async (req, res, adminId = "admin") => {
   try {
     const { userId } = req.params;
 
-    const admin = await User.findOne({ role: "admin" });
-
-    if (!admin) {
-      return res.status(404).json({ message: "Admin not found" });
-    }
-
     const messages = await Message.find({
       $or: [
-        { senderId: userId, receiverId: admin._id },
-        { senderId: admin._id, receiverId: userId }
+        { senderId: userId, receiverId: adminId },
+        { senderId: adminId, receiverId: userId }
       ]
     })
     .sort({ createdAt: 1 })
-    .limit(50);
+    .limit(100);
 
     res.json(messages);
 
