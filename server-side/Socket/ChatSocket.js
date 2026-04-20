@@ -1,117 +1,69 @@
 // sockets/chatSocket.js
 const Message = require("../models/Message");
-const User = require("../models/User");
+const { generateAIResponse } = require("../controllers/aiController");
+const mongoose = require('mongoose');
+
+let users = {}; // { userId: socketId }
 
 module.exports = (io) => {
-
   io.on("connection", (socket) => {
-    console.log("✅ User connected:", socket.id);
+    console.log("✅ Connected:", socket.id);
 
-    // Join room
-    socket.on("join", (userId) => {
+    // Join room - store socket mapping
+    socket.on("join", ({ userId }) => {
+      users[userId] = socket.id;
       socket.join(userId);
+      console.log(`User ${userId} joined`);
     });
 
     // Send message
-    socket.on("sendMessage", async ({ senderId, text }) => {
+    socket.on("sendMessage", async ({ senderId, receiverId, text }) => {
       try {
-        const admin = await User.findOne({ role: "admin" });
-
-        if (!admin) return;
-
-        const message = await Message.create({
+        console.log(`Message from ${senderId}: ${text}`);
+        
+        // Save user message (adminId as string ok, Mongo stores as ObjectId or string)
+        const userMessage = await Message.create({
           senderId,
-          receiverId: admin._id,
+          receiverId,
           text
         });
 
-        // Send to both
-        io.to(senderId).emit("receiveMessage", message);
-        io.to(admin._id.toString()).emit("receiveMessage", message);
+        // Send to receiver
+        const receiverSocket = users[receiverId];
+        if (receiverSocket) {
+          io.to(receiverSocket).emit("receiveMessage", userMessage);
+        }
+        socket.emit("messageSent", userMessage);
+
+        // AI auto-reply if not from admin
+        if (senderId !== "admin") {
+          const aiText = await generateAIResponse(text);
+          const aiMessage = await Message.create({
+            senderId: "admin",
+            receiverId: senderId,
+            text: aiText
+          });
+
+          socket.emit("receiveMessage", aiMessage);
+          if (receiverSocket) {
+            io.to(receiverSocket).emit("receiveMessage", aiMessage);
+          }
+          console.log(`AI replied to ${senderId}`);
+        }
 
       } catch (err) {
-        console.error("❌ Socket send error:", err);
+        console.error("ChatSocket error:", err);
+        socket.emit("messageSent", { text: "Sorry, try again.", senderId, receiverId });
       }
     });
 
     socket.on("disconnect", () => {
-      console.log("❌ User disconnected");
+      for (let id in users) {
+        if (users[id] === socket.id) {
+          delete users[id];
+          console.log(`User ${id} disconnected`);
+        }
+      }
     });
   });
-
 };
-
-
-
-
-
-
-// const Message = require("../models/Message");
-// const { generateAIResponse } = require("../controllers/aiController");
-
-// let users = {}; // { userId: socketId }
-
-// const ChatSocket = (io) => {
-//   io.on("connection", (socket) => {
-//     console.log("Connected:", socket.id);
-
-//     // join user or admin
-//     socket.on("join", ({ userId }) => {
-//       users[userId] = socket.id;
-//     });
-
-//     // send message (user → admin OR admin → user)
-//     socket.on("sendMessage", async ({ senderId, receiverId, text }) => {
-//       try {
-//         // Save user message
-//         const userMessage = await Message.create({
-//           senderId,
-//           receiverId,
-//           text,
-//         });
-
-//         // Send user message to admin/receiver (if admin connected)
-//         const receiverSocket = users[receiverId];
-//         if (receiverSocket) {
-//           io.to(receiverSocket).emit("receiveMessage", userMessage);
-//         }
-//         socket.emit("messageSent", userMessage);
-
-//         // If not from admin, generate AI response
-//         if (senderId !== "admin") {
-//           const aiText = await generateAIResponse(text);
-//           const aiMessage = await Message.create({
-//             senderId: "admin",
-//             receiverId: senderId,
-//             text: aiText,
-//           });
-
-//           // Send AI response back to user
-//           socket.emit("receiveMessage", aiMessage);
-
-//           // Send to admin if connected
-//           if (receiverSocket) {
-//             io.to(receiverSocket).emit("receiveMessage", aiMessage);
-//           }
-//         }
-
-//       } catch (err) {
-//         console.error("Chat error:", err);
-//         // Send error message to sender
-//         socket.emit("messageSent", {
-//           text: "Sorry, message sending failed.",
-//           senderId,
-//           receiverId,
-//         });
-//       }
-//     });
-
-//     socket.on("disconnect", () => {
-//       for (let id in users) {
-//         if (users[id] === socket.id) delete users[id];
-//       }
-//     });
-//   });
-// };
-
-// module.exports = ChatSocket;

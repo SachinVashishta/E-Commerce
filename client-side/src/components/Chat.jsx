@@ -4,8 +4,8 @@ import {io} from "socket.io-client";
 import axios from "axios";
 import './Chat.css';
 
-const API_URL = import.meta.env.VITE_API_URL 
-const socket = io("https://e-commerce-47.onrender.com", {
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+const socket = API_URL === 'http://localhost:5000' ? io(API_URL) : io("https://e-commerce-47.onrender.com", {
   transports: ["websocket"],   // force websocket
   withCredentials: true,
   reconnection: true,
