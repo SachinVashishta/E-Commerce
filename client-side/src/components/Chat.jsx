@@ -9,7 +9,7 @@ export default function Chat() {
   const { user } = useAuth();
   const [messages, setMessages] = useState([]);
   const [text, setText] = useState("");
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [adminId, setAdminId] = useState(null);
   const [aiLoading, setAiLoading] = useState(false);
   const socketRef = useRef(null);
@@ -17,7 +17,10 @@ export default function Chat() {
 
   // 1. Admin ki ObjectId laao
   useEffect(() => {
-    if (!userId) return;
+    if (!userId) {
+      setLoading(false);
+      return;
+    }
     axios.get(`${API_URL}/api/users/admin-id`)
     .then(res => setAdminId(res.data.adminId))
     .catch(err => console.error("Admin ID error", err));
