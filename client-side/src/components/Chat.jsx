@@ -43,9 +43,9 @@ export default function Chat() {
 
   // Load messages
   useEffect(() => {
-    if (userId && adminId) {
+    if (userId) {
       setLoading(true);
-      axios.get(`${API_URL}/messages/${userId}/${adminId}`)
+      axios.get(`${API_URL}/messages/${userId}`)
         .then((res) => {
           setMessages(res.data || []);
           setError(null);
@@ -56,7 +56,7 @@ export default function Chat() {
         })
         .finally(() => setLoading(false));
     }
-  }, [userId, adminId, API_URL]);
+  }, [userId, API_URL]);
 
   // Receive message
   useEffect(() => {
