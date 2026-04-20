@@ -63,7 +63,7 @@ export default function Chat() {
     if (!userId) return;
 
     setLoading(true);
-    axios.get(`${API_URL}/api/messages/${userId}`)
+    axios.get(`${API_URL}/api/messages/:userId`)
       .then((res) => {
         setMessages(res.data || []);
         setError(null);
