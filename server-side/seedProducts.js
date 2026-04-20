@@ -4,7 +4,7 @@ const User = require('./models/User');
 
 const seedData = async () => {
   try {
-    await mongoose.connect('mongodb+srv://sachinVashishtdb_user:ShivShankar22@cluster0.3o4awij.mongodb.net/?appName=Cluster0');
+    await mongoose.connect('mongodb+srv://sachinVashishtdb_user:qvWq39s8uRxhCkwA@cluster0.3o4awij.mongodb.net/?appName=Cluster0');
     console.log('MongoDB Connected for seeding');
 
     // Seed Admin User (if not exists)
