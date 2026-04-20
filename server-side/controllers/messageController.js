@@ -1,43 +1,50 @@
 const Message = require('../models/Message');
+const User = require('../models/User');
+const { generateAIResponse } = require('./aiController');
 
-// Get messages between user and admin
+// ✅ Get messages (user ↔ admin)
 const getMessages = async (req, res) => {
   try {
-    const { userId, adminId } = req.params;
-    
-    // Handle string IDs like "guest"/"admin"
-    const query = {
+    const { userId } = req.params;
+
+    const admin = await User.findOne({ role: "admin" });
+
+    if (!admin) {
+      return res.status(404).json({ message: "Admin not found" });
+    }
+
+    const messages = await Message.find({
       $or: [
-        { senderId: userId, receiverId: adminId },
-        { senderId: adminId, receiverId: userId }
+        { senderId: userId, receiverId: admin._id },
+        { senderId: admin._id, receiverId: userId }
       ]
-    };
-    
-    const messages = await Message.find(query)
+    })
     .sort({ createdAt: 1 })
-    .lean()
     .limit(50);
 
     res.json(messages);
+
   } catch (error) {
-    console.error('Get messages error:', error);
-    res.status(500).json({ message: 'Server error' });
+    console.error("❌ Get messages error:", error);
+    res.status(500).json({ message: "Server error" });
   }
 };
 
-const { generateAIResponse } = require('./aiController');
-
-// Get AI response endpoint
+// ✅ AI response
 const getAIResponse = async (req, res) => {
   try {
     const { question } = req.body;
-    if (!question) return res.status(400).json({ message: 'Question required' });
-    
-    const aiReply = await generateAIResponse(question);
-    res.json({ reply: aiReply });
+
+    if (!question) {
+      return res.status(400).json({ message: "Question required" });
+    }
+
+    const reply = await generateAIResponse(question);
+    res.json({ reply });
+
   } catch (error) {
-    console.error('AI response error:', error);
-    res.status(500).json({ message: 'AI service unavailable' });
+    console.error("❌ AI error:", error);
+    res.status(500).json({ message: "AI failed" });
   }
 };
 

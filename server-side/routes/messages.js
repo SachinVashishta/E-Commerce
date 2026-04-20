@@ -1,11 +1,11 @@
 const express = require('express');
 const router = express.Router();
-const messageController = require('../controllers/messageController');
+const { getMessages, getAIResponse } = require('../controllers/messageController');
 
-// Get messages between specific user and admin
-router.get('/:userId/:adminId', messageController.getMessages);
+// ✅ Only userId needed
+router.get('/:userId', getMessages);
 
-// POST /api/messages/ai - Direct AI response
-router.post('/ai', messageController.getAIResponse);
+// ✅ AI route
+router.post('/ai', getAIResponse);
 
 module.exports = router;
