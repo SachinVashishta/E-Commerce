@@ -82,7 +82,7 @@ const Nav = () => {
 
       <div className={`mobile-menu ${isMenuOpen ? 'active' : ''}`}>
         <Link to="/" onClick={closeMenu}>🏠 Home</Link>
-        
+        <Link to="/chat" onClick={closeMenu}>💬 Chat</Link>
         {user ? (
           <>
             <Link to="/profile" onClick={closeMenu}>👤 Profile</Link>

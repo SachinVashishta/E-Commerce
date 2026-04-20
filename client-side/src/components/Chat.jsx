@@ -45,7 +45,7 @@ export default function Chat() {
   useEffect(() => {
     if (userId && adminId) {
       setLoading(true);
-      axios.get(`${API_URL}/api/messages/${userId}/${adminId}`)
+      axios.get(`${API_URL}/messages/${userId}/${adminId}`)
         .then((res) => {
           setMessages(res.data || []);
           setError(null);
