@@ -5,15 +5,17 @@ const getMessages = async (req, res) => {
   try {
     const { userId, adminId } = req.params;
     
-    const messages = await Message.find({
+    // Handle string IDs like "guest"/"admin"
+    const query = {
       $or: [
         { senderId: userId, receiverId: adminId },
         { senderId: adminId, receiverId: userId }
       ]
-    })
+    };
+    
+    const messages = await Message.find(query)
     .sort({ createdAt: 1 })
-    .populate('senderId', 'name email')
-    .populate('receiverId', 'name email')
+    .lean()
     .limit(50);
 
     res.json(messages);
