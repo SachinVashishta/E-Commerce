@@ -39,7 +39,7 @@ useEffect(() => {
 // Fetch product
 const fetchProduct = async () => {
   try {
-    const res = await axios.get(`${API_URL}/products/${id}`);
+    const res = await axios.get(`${API_URL}/api/products/${id}`);
     setProduct(res.data);
     setAdminMsg('');
   } catch (error) {
@@ -53,7 +53,7 @@ const fetchProduct = async () => {
 // Update handler (admin)
 const handleUpdate = async () => {
   try {
-    const res = await axios.put(`${API_URL}/products/${id}`, editForm);
+    const res = await axios.put(`${API_URL}/api/products/${id}`, editForm);
     setProduct(res.data);
     setAdminMsg('✅ Product updated successfully!');
     setTimeout(() => setAdminMsg(''), 3000);
@@ -66,7 +66,7 @@ const handleUpdate = async () => {
 const handleDelete = async () => {
   if (window.confirm('Are you sure you want to delete this product?')) {
     try {
-      await axios.delete(`${API_URL}/products/${id}`);
+      await axios.delete(`${API_URL}/api/products/${id}`);
       setAdminMsg('🗑️ Product deleted!');
       setTimeout(() => navigate('/'), 1500);
     } catch (error) {

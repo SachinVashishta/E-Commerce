@@ -34,10 +34,10 @@ const API_URL = import.meta.env.VITE_API_URL ;
   const fetchAdminData = async () => {
     try {
       const token = localStorage.getItem('token');
-      const usersRes = await axios.get(`${API_URL}/admin/users`, {
+      const usersRes = await axios.get(`${API_URL}/api/admin/users`, {
         headers: { Authorization: `Bearer ${token}` }
       });
-      const queriesRes = await axios.get(`${API_URL}/admin/queries`, {
+      const queriesRes = await axios.get(`${API_URL}/api/admin/queries`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setUsers(usersRes.data);
@@ -73,7 +73,7 @@ const API_URL = import.meta.env.VITE_API_URL ;
       stock: parseInt(newProduct.stock) || 10
     };
     try {
-      await axios.post(`${API_URL}/products`, productData, {
+      await axios.post(`${API_URL}/api/products`, productData, {
         headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
       });
       showToast('✅ Product added successfully!', 'success');

@@ -18,7 +18,7 @@ const API_URL = import.meta.env.VITE_API_URL;
         const params = {};
         if (selectedCategory !== 'All') params.category = selectedCategory;
         if (searchParams.get('search')) params.search = searchParams.get('search');
-        const res = await axios.get(`${API_URL}/products`, { params });
+        const res = await axios.get(`${API_URL}/api/products`, { params });
         setProducts(res.data);
       } catch (error) {
         console.error(error);
