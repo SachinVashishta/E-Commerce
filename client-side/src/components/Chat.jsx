@@ -4,7 +4,7 @@ import io from "socket.io-client";
 import axios from "axios";
 import './Chat.css';
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+const API_URL = import.meta.env.VITE_API_URL 
 const socket = io(API_URL);
 
 export default function Chat() {

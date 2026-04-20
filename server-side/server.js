@@ -1,46 +1,127 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
-const authRouter = require('./routes/auth')
 const dotenv = require('dotenv');
-const ChatSocket = require('./Socket/ChatSocket')
-const http = require('http')
+const http = require('http');
 const { Server } = require('socket.io');
-const app = express();
- const server = http.createServer(app);
+
+const authRouter = require('./routes/auth');
+const ChatSocket = require('./Socket/ChatSocket');
 
 dotenv.config();
 
+const app = express();
+const server = http.createServer(app);
 
+// ✅ Allowed origins (IMPORTANT for Render multiple domains)
+const allowedOrigins = [
+  process.env.CLIENT_URL,
+  "https://e-commerce-0047.onrender.com"
+];
 
-// Middleware
-const io = new Server(server,{
-  cors: {
-    origin: process.env.CLIENT_URL,
-    credentials: true
-  }
-});
-ChatSocket(io);
+// ✅ CORS Middleware (Express)
+app.use(cors({
+  origin: function (origin, callback) {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error("CORS not allowed"));
+    }
+  },
+  credentials: true
+}));
 
-app.use(cors({ origin: process.env.CLIENT_URL , credentials: true }));
 app.use(express.json());
 
-// Routes
-app.use('/api/auth',authRouter);
+// ✅ Socket.io with proper CORS
+const io = new Server(server, {
+  cors: {
+    origin: allowedOrigins,
+    methods: ["GET", "POST"],
+    credentials: true
+  },
+  transports: ["websocket", "polling"] // important for Render
+});
+
+// ✅ Attach socket logic
+ChatSocket(io);
+
+// ✅ Routes
+app.use('/api/auth', authRouter);
 app.use('/api/products', require('./routes/products'));
 app.use('/api/admin', require('./routes/admin'));
 app.use('/api/cart', require('./routes/cart'));
 app.use('/api/orders', require('./routes/orders'));
 app.use('/api/messages', require('./routes/messages'));
 
+// ✅ Health check (VERY IMPORTANT for Render 502 fix)
+app.get('/', (req, res) => {
+  res.send('API is running...');
+});
 
-// MongoDB Connection
+// ✅ MongoDB connection
 mongoose.connect(process.env.MONGODB_URI)
   .then(() => console.log('✅ MongoDB Connected'))
   .catch(err => {
-    console.error('❌ MongoDB Connection Error:', err.message);
+    console.error('❌ MongoDB Error:', err.message);
     process.exit(1);
   });
 
+// ✅ Start server
 const PORT = process.env.PORT || 5000;
-server.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+server.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
+
+
+
+
+
+
+
+
+
+// const express = require('express');
+// const mongoose = require('mongoose');
+// const cors = require('cors');
+// const authRouter = require('./routes/auth')
+// const dotenv = require('dotenv');
+// const ChatSocket = require('./Socket/ChatSocket')
+// const http = require('http')
+// const { Server } = require('socket.io');
+// const app = express();
+//  const server = http.createServer(app);
+
+// dotenv.config();
+
+
+
+// // Middleware
+// const io = new Server(server,{
+//   cors: {
+//     origin: process.env.CLIENT_URL,
+//     credentials: true
+//   }
+// });
+// ChatSocket(io);
+
+// app.use(cors({ origin: process.env.CLIENT_URL , credentials: true }));
+// app.use(express.json());
+
+// // Routes
+// app.use('/api/auth',authRouter);
+// app.use('/api/products', require('./routes/products'));
+// app.use('/api/admin', require('./routes/admin'));
+// app.use('/api/cart', require('./routes/cart'));
+// app.use('/api/orders', require('./routes/orders'));
+// app.use('/api/messages', require('./routes/messages'));
+
+
+// // MongoDB Connection
+// mongoose.connect(process.env.MONGODB_URI)
+//   .then(() => console.log('✅ MongoDB Connected'))
+//   .catch(err => {
+//     console.error('❌ MongoDB Connection Error:', err.message);
+//     process.exit(1);
+//   });
+
+// const PORT = process.env.PORT || 5000;
+// server.listen(PORT, () => console.log(`Server running on port ${PORT}`));
