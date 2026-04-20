@@ -30,7 +30,13 @@ export default function Chat() {
   // 2. Socket connection
   useEffect(() => {
     if (!userId) return;
-    const socket = io(API_URL, { transports: ["websocket"] });
+    const socket = io(API_URL, { transports: ["websocket","polling"],
+      upgrade: true,
+      reconnection: true,
+      reconnectionAttempts: 5,
+      reconnectionDelay: 5000,
+      timeout: 20000,
+     });
     socketRef.current = socket;
     socket.emit("join", { userId });
 
