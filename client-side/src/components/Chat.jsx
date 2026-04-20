@@ -1,13 +1,13 @@
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, useCallback } from "react";
 import { useAuth } from "../context/AuthContext";
 import { io } from "socket.io-client";
 import axios from "axios";
+import './Chat.css';
 
 const API_URL = import.meta.env.VITE_API_URL;
 
 export default function Chat() {
   const { user } = useAuth();
-  const [messages, setMessages] = useState([]);
   const [text, setText] = useState("");
   const [loading, setLoading] = useState(false);
   const [adminId, setAdminId] = useState(null);
