@@ -58,8 +58,9 @@ const Nav = () => {
         <div className="nav-links">
           <Link to="/">🏠 Home</Link>
           
-          {user ? (
+        {user ? (
             <>
+              <Link to="/chat">💬 Chat</Link>
               <Link to="/profile">👤 Profile</Link>
               {user.role === 'admin' && <Link to="/admin">⚙️ Admin</Link>}
             </>
