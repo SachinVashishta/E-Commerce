@@ -1,12 +1,9 @@
+
 const express = require('express');
-const router = express.Router();
 const { getMessages, getAIResponse } = require('../controllers/messageController');
+const router = express.Router();
 
-// ✅ Fixed: Single param /:userId (matches client call)
-router.get('/:userId', (req, res) => getMessages(req, res, "admin"));
-
-// ✅ AI route (unused by main chat, but keep)
-router.post('/ai', getAIResponse);
+router.get('/:userId', getMessages);  // GET /api/messages/66fe...
+router.post('/ai', getAIResponse);    // POST /api/messages/ai
 
 module.exports = router;
-

@@ -1,146 +1,104 @@
-import { useEffect, useState, useRef, useCallback } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useAuth } from "../context/AuthContext";
 import { io } from "socket.io-client";
 import axios from "axios";
-import './Chat.css';
 
-const API_URL = import.meta.env.VITE_API_URL 
+const API_URL = import.meta.env.VITE_API_URL;
 
 export default function Chat() {
   const { user } = useAuth();
   const [messages, setMessages] = useState([]);
   const [text, setText] = useState("");
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const [isTyping, setIsTyping] = useState(false);
-  const messagesEndRef = useRef(null);
+  const [adminId, setAdminId] = useState(null);
+  const [aiLoading, setAiLoading] = useState(false);
   const socketRef = useRef(null);
+  const userId = user?._id;
 
-  const userId = user?._id || "guest";
-  const adminId = "admin";
-
-  // ✅ Local socket connection with cleanup
+  // 1. Admin ki ObjectId laao
   useEffect(() => {
     if (!userId) return;
+    axios.get(`${API_URL}/api/users/admin-id`)
+    .then(res => setAdminId(res.data.adminId))
+    .catch(err => console.error("Admin ID error", err));
+  }, [userId]);
 
-    const socket = io(API_URL, {
-      transports: ["websocket", "polling"],
-      withCredentials: true,
-      reconnection: true,
-      reconnectionAttempts: 5
-    });
+  // 2. Socket connect
+  useEffect(() => {
+    if (!userId) return;
+    const socket = io(API_URL, { transports: ["websocket"] });
     socketRef.current = socket;
-
-    // Join room
     socket.emit("join", { userId });
 
-    // Receive messages
-    const handleReceive = (msg) => {
-      setMessages((prev) => [...prev, msg]);
-      setIsTyping(false);
-    };
-    socket.on("receiveMessage", handleReceive);
-    socket.on("messageSent", handleReceive);
+    socket.on("receiveMessage", (msg) => {
+      setMessages(prev => [...prev, msg]);
+    });
 
-    return () => {
-      socket.off("receiveMessage", handleReceive);
-      socket.off("messageSent", handleReceive);
-      socket.disconnect();
-    };
-  }, [userId, API_URL]);
+    return () => socket.disconnect();
+  }, [userId]);
 
-  // Scroll to bottom
-  const scrollToBottom = useCallback(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, []);
-
-  useEffect(() => {
-    scrollToBottom();
-  }, [messages, scrollToBottom]);
-
-  // Load initial messages
+  // 3. Purane messages load
   useEffect(() => {
     if (!userId) return;
-
     setLoading(true);
-    axios.get(`https://e-commerce-47.onrender.com/api/messages/${userId}`)
-      .then((res) => {
-        setMessages(res.data || []);
-        setError(null);
-      })
-      .catch((err) => {
-        console.error("Load messages error:", err);
-        setError("Failed to load messages");
-      })
-      .finally(() => setLoading(false));
-  }, [userId, API_URL]);
+    axios.get(`${API_URL}/api/messages/${userId}`)
+    .then(res => setMessages(res.data || []))
+    .catch(err => console.error("Load error:", err))
+    .finally(() => setLoading(false));
+  }, [userId]);
 
+  // 4. Admin ko message bhejo
   const sendMessage = (e) => {
     e.preventDefault();
-    if (!text.trim() || !userId || !socketRef.current) return;
+    if (!text.trim() || !userId || !adminId) return;
 
     const messageData = {
       senderId: userId,
-      receiverId: adminId,
-      text: text.trim()
+      receiverId: adminId, // ✅ Asli ObjectId
+      message: text.trim() // ✅ 'message' key
     };
 
     socketRef.current.emit("sendMessage", messageData);
     setText("");
-    setIsTyping(true);
   };
 
-  if (!user) {
-    return <div className="error">Please login to chat</div>;
-  }
+  // 5. AI se pucho
+  const askAI = async () => {
+    if (!text.trim() || !userId) return;
+    setAiLoading(true);
+
+    try {
+      await axios.post(`${API_URL}/api/messages/ai`, {
+        question: text.trim(),
+        userId: userId
+      });
+      // AI ka reply socket se aa jayega kyunki backend me save ho raha
+      setText("");
+    } catch (err) {
+      console.error("AI error:", err);
+    } finally {
+      setAiLoading(false);
+    }
+  };
+
+  if (!user) return <div>Please login</div>;
+  if (loading) return <div>Loading...</div>;
 
   return (
-    <div className="chat-container">
-      <div className="chat-header">
-        <h2>💬 AI Support Chat</h2>
-        <p>Ask anything about products, orders, or support!</p>
-      </div>
-
-      <div className="chat-messages">
-        {loading && <div className="loading">Loading messages...</div>}
-        {error && <div className="error">{error}</div>}
-        
-        {isTyping && (
-          <div className="message received">
-            <div>🤖 AI is typing...</div>
-          </div>
-        )}
-        
-        {messages.map((msg, i) => (
-          <div
-            key={msg._id || i}
-            className={`message ${msg.senderId === userId ? 'sent' : 'received'}`}
-          >
-            <div>{msg.text}</div>
-            <div className="message-time">
-              {new Date(msg.createdAt || Date.now()).toLocaleTimeString()}
-            </div>
+    <div>
+      <div>
+        {messages.map(msg => (
+          <div key={msg._id}>
+            <b>{msg.senderId === userId ? 'You' : 'Support'}:</b> {msg.message}
           </div>
         ))}
-        <div ref={messagesEndRef} />
+        {aiLoading && <div>AI is thinking...</div>}
       </div>
-
-      <form onSubmit={sendMessage} className="chat-input-container">
-        <textarea
-          className="chat-input"
-          value={text}
-          onChange={(e) => setText(e.target.value)}
-          placeholder="Type your question... (Enter to send)"
-          rows="1"
-          disabled={loading}
-          maxLength={500}
-        />
-        <button
-          type="submit"
-          className="send-btn"
-          disabled={!text.trim() || loading}
-        >
-          ➤
+      <form onSubmit={sendMessage}>
+        <input value={text} onChange={e => setText(e.target.value)} placeholder="Type..." />
+        <button type="submit">Send</button>
+        <button type="button" onClick={askAI} disabled={aiLoading}>
+          {aiLoading ? '...' : 'Ask AI'}
         </button>
       </form>
     </div>

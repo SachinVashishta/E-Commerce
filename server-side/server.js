@@ -6,20 +6,26 @@ const http = require('http');
 const { Server } = require('socket.io');
 
 const authRouter = require('./routes/auth');
-const ChatSocket = require('./Socket/ChatSocket');
+const userRoutes = require('./routes/users'); // ✅ 1. Naya import
+const productRoutes = require('./routes/products');
+const adminRoutes = require('./routes/admin');
+const cartRoutes = require('./routes/cart');
+const orderRoutes = require('./routes/orders');
+const messageRoutes = require('./routes/messages');
+const { saveMessage } = require('./controllers/messageController'); // ✅ 2. Naya import
 
 dotenv.config();
 
 const app = express();
 const server = http.createServer(app);
 
-// ✅ Allowed origins (IMPORTANT for Render multiple domains)
+// ✅ Allowed origins
 const allowedOrigins = [
   process.env.CLIENT_URL,
   "https://e-commerce-0047.onrender.com"
 ];
 
-// ✅ CORS Middleware (Express)
+// ✅ CORS Middleware
 app.use(cors({
   origin: function (origin, callback) {
     if (!origin || allowedOrigins.includes(origin)) {
@@ -37,38 +43,66 @@ app.use(express.json());
 const io = new Server(server, {
   cors: {
     origin: [
-      "https://e-commerce-0047.onrender.com"
+      "https://e-commerce-0047.onrender.com",
+      process.env.CLIENT_URL
     ],
     methods: ["GET", "POST"],
     credentials: true
   },
   transports: ["websocket", "polling"],
-  allowEIO3: true   // ✅ ADD THIS (important for compatibility)
+  allowEIO3: true
 });
 
-// ✅ Attach socket logic
-ChatSocket(io);
+// ✅ SOCKET LOGIC YAHI LIKH DE - ChatSocket.js delete kar de
+io.on('connection', (socket) => {
+  console.log('User connected:', socket.id);
+
+  socket.on('join', ({ userId }) => {
+    socket.join(userId);
+    console.log(`User ${userId} joined room`);
+  });
+
+  socket.on('sendMessage', async (data) => {
+    try {
+      // 1. DB me save karo
+      const savedMsg = await saveMessage(data);
+      
+      // 2. Sender aur receiver dono ko bhejo
+      if (savedMsg) {
+        io.to(data.senderId).emit('receiveMessage', savedMsg);
+        io.to(data.receiverId).emit('receiveMessage', savedMsg);
+      }
+    } catch (error) {
+      console.error("Socket sendMessage error:", error);
+    }
+  });
+
+  socket.on('disconnect', () => {
+    console.log('User disconnected:', socket.id);
+  });
+});
 
 // ✅ Routes
 app.use('/api/auth', authRouter);
-app.use('/api/products', require('./routes/products'));
-app.use('/api/admin', require('./routes/admin'));
-app.use('/api/cart', require('./routes/cart'));
-app.use('/api/orders', require('./routes/orders'));
-app.use('/api/messages', require('./routes/messages'));
+app.use('/api/products', productRoutes);
+app.use('/api/admin', adminRoutes);
+app.use('/api/cart', cartRoutes);
+app.use('/api/orders', orderRoutes);
+app.use('/api/messages', messageRoutes);
+app.use('/api/users', userRoutes); // ✅ 3. Naya route add kiya
 
-// ✅ Health check (VERY IMPORTANT for Render 502 fix)
+// ✅ Health check
 app.get('/', (req, res) => {
   res.send('API is running...');
 });
 
 // ✅ MongoDB connection
 mongoose.connect(process.env.MONGODB_URI)
-  .then(() => console.log('✅ MongoDB Connected'))
-  .catch(err => {
-    console.error('❌ MongoDB Error:', err.message);
-    process.exit(1);
-  });
+.then(() => console.log('✅ MongoDB Connected'))
+.catch(err => {
+  console.error('❌ MongoDB Error:', err.message);
+  process.exit(1);
+});
 
 // ✅ Start server
 const PORT = process.env.PORT || 5000;
