@@ -1,10 +1,10 @@
-import { useEffect, useState, useRef, useCallback } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useAuth } from "../context/AuthContext";
 import { io } from "socket.io-client";
 import axios from "axios";
 import './Chat.css';
 
-const API_URL = import.meta.env.VITE_API_URL ;
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
 export default function Chat() {
   const { user } = useAuth();
@@ -16,7 +16,7 @@ export default function Chat() {
   const socketRef = useRef(null);
   const userId = user?._id;
 
-  // 1. Admin ki ObjectId laao
+  // 1. Get admin ID
   useEffect(() => {
     if (!userId) {
       setLoading(false);
@@ -27,7 +27,7 @@ export default function Chat() {
     .catch(err => console.error("Admin ID error", err));
   }, [userId]);
 
-  // 2. Socket connect
+  // 2. Socket connection
   useEffect(() => {
     if (!userId) return;
     const socket = io(API_URL, { transports: ["websocket"] });
@@ -41,7 +41,7 @@ export default function Chat() {
     return () => socket.disconnect();
   }, [userId]);
 
-  // 3. Purane messages load
+  // 3. Load past messages
   useEffect(() => {
     if (!userId) return;
     setLoading(true);
@@ -51,135 +51,108 @@ export default function Chat() {
     .finally(() => setLoading(false));
   }, [userId]);
 
-  // 4. Admin ko message bhejo
+  // 4. Send to admin
   const sendMessage = (e) => {
     e.preventDefault();
     if (!text.trim() || !userId || !adminId) return;
 
     const messageData = {
       senderId: userId,
-      receiverId: adminId, // ✅ Asli ObjectId
-      message: text.trim() // ✅ 'message' key
+      receiverId: adminId,
+      message: text.trim()
     };
 
     socketRef.current.emit("sendMessage", messageData);
     setText("");
   };
 
-  // 5. AI se pucho
+  // 5. Ask AI (fixed - no duplicate code)
   const askAI = async () => {
-  if (!text.trim() || !userId || !adminId) return;
-  setAiLoading(true);
-  const userQuestion = text.trim();
-  setText(""); // Input khali kar de
+    if (!text.trim() || !userId || !adminId) return;
+    setAiLoading(true);
+    const userQuestion = text.trim();
+    setText("");
 
-  // 1. User ka question UI me turant dikha de
-  const userMsg = {
-    _id: Date.now(),
-    senderId: userId,
-    receiverId: adminId,
-    message: userQuestion,
-    createdAt: new Date()
+    // Show user message immediately
+    const userMsg = {
+      _id: Date.now(),
+      senderId: userId,
+      receiverId: adminId,
+      message: userQuestion,
+      createdAt: new Date()
+    };
+    setMessages(prev => [...prev, userMsg]);
+
+    try {
+      const res = await axios.post(`${API_URL}/api/messages/ai`, {
+        question: userQuestion,
+        userId: userId
+      });
+
+      // Show AI reply
+      const aiMsg = {
+        _id: Date.now() + 1,
+        senderId: adminId,
+        receiverId: userId,
+        message: res.data.reply,
+        createdAt: new Date()
+      };
+      setMessages(prev => [...prev, aiMsg]);
+
+    } catch (err) {
+      console.error("AI error:", err);
+      const errorMsg = {
+        _id: Date.now() + 2,
+        senderId: adminId,
+        receiverId: userId,
+        message: "AI failed. Try again.",
+        createdAt: new Date()
+      };
+      setMessages(prev => [...prev, errorMsg]);
+    } finally {
+      setAiLoading(false);
+    }
   };
-  setMessages(prev => [...prev, userMsg]);
 
-  try {
-    // 2. Backend ko call kar aur response ka wait kar
-    const res = await axios.post(`${API_URL}/api/messages/ai`, {
-      question: userQuestion,
-      userId: userId
-    });
-
-    // 3. ✅ Backend se jo reply aaya use UI me add kar de
-    const aiMsg = {
-      _id: Date.now() + 1,
-      senderId: adminId, // AI ki taraf se admin reply kar raha
-      receiverId: userId,
-      message: res.data.reply, // Yahi line missing thi
-      createdAt: new Date()
-    };
-    setMessages(prev => [...prev, aiMsg]);
-
-  } catch (err) {
-    console.error("AI error:", err);
-    // Error aane pe bhi user ko bata de
-    const errorMsg = {
-      _id: Date.now() + 2,
-      senderId: adminId,
-      receiverId: userId,
-      message: "AI failed. Check backend logs.",
-      createdAt: new Date()
-    };
-    setMessages(prev => [...prev, errorMsg]);
-  } finally {
-    setAiLoading(false);
-  }
-};const askAI = async () => {
-  if (!text.trim() || !userId || !adminId) return;
-  setAiLoading(true);
-  const userQuestion = text.trim();
-  setText(""); // Input khali kar de
-
-  // 1. User ka question UI me turant dikha de
-  const userMsg = {
-    _id: Date.now(),
-    senderId: userId,
-    receiverId: adminId,
-    message: userQuestion,
-    createdAt: new Date()
-  };
-  setMessages(prev => [...prev, userMsg]);
-
-  try {
-    // 2. Backend ko call kar aur response ka wait kar
-    const res = await axios.post(`${API_URL}/api/messages/ai`, {
-      question: userQuestion,
-      userId: userId
-    });
-
-    // 3. ✅ Backend se jo reply aaya use UI me add kar de
-    const aiMsg = {
-      _id: Date.now() + 1,
-      senderId: adminId, // AI ki taraf se admin reply kar raha
-      receiverId: userId,
-      message: res.data.reply, // Yahi line missing thi
-      createdAt: new Date()
-    };
-    setMessages(prev => [...prev, aiMsg]);
-
-  } catch (err) {
-    console.error("AI error:", err);
-    // Error aane pe bhi user ko bata de
-    const errorMsg = {
-      _id: Date.now() + 2,
-      senderId: adminId,
-      receiverId: userId,
-      message: "AI failed. Check backend logs.",
-      createdAt: new Date()
-    };
-    setMessages(prev => [...prev, errorMsg]);
-  } finally {
-    setAiLoading(false);
-  }
-};
-  if (!user) return <div>Please login</div>;
-  if (loading) return <div>Loading...</div>;
+  if (!user) return <div className="error">Please login</div>;
+  if (loading) return <div className="loading">Loading chat...</div>;
 
   return (
-    <div>
-      <div>
+    <div className="chat-container">
+      <div className="chat-header">
+        <h2>💬 Support Chat</h2>
+        <p>Messages with Admin & AI</p>
+      </div>
+
+      <div className="chat-messages">
         {messages.map(msg => (
-          <div key={msg._id}>
-            <b>{msg.senderId === userId ? 'You' : 'Support'}:</b> {msg.message}
+          <div key={msg._id} className={`message ${msg.senderId === userId ? 'sent' : 'received'}`}>
+            <div>{msg.message}</div>
+            <div className="message-time">
+              {new Date(msg.createdAt).toLocaleTimeString()}
+            </div>
           </div>
         ))}
-        {aiLoading && <div>AI is thinking...</div>}
+        {aiLoading && (
+          <div className="message received">
+            <div>🤖 AI is thinking...</div>
+          </div>
+        )}
       </div>
-      <form onSubmit={sendMessage}>
-        <input value={text} onChange={e => setText(e.target.value)} placeholder="Type..." />
-        <button type="submit">Send</button>
-        <button type="button" onClick={askAI} disabled={aiLoading}>
-          {aiLoading ? '...' : 'Ask AI'}
+
+      <form className="chat-input-container" onSubmit={sendMessage}>
+        <input 
+          className="chat-input" 
+          value={text} 
+          onChange={e => setText(e.target.value)} 
+          placeholder="Type your message..." 
+          disabled={!adminId}
+        />
+        <button type="submit" className="send-btn" disabled={!text.trim() || !adminId}>
+          Send
+        </button>
+        <button type="button" className="send-btn" onClick={askAI} disabled={aiLoading || !adminId}>
+          {aiLoading ? '...' : '🤖 AI'}
         </button>
       </form>
     </div>
