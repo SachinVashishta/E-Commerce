@@ -68,23 +68,100 @@ export default function Chat() {
 
   // 5. AI se pucho
   const askAI = async () => {
-    if (!text.trim() || !userId) return;
-    setAiLoading(true);
+  if (!text.trim() || !userId || !adminId) return;
+  setAiLoading(true);
+  const userQuestion = text.trim();
+  setText(""); // Input khali kar de
 
-    try {
-      await axios.post(`${API_URL}/api/messages/ai`, {
-        question: text.trim(),
-        userId: userId
-      });
-      // AI ka reply socket se aa jayega kyunki backend me save ho raha
-      setText("");
-    } catch (err) {
-      console.error("AI error:", err);
-    } finally {
-      setAiLoading(false);
-    }
+  // 1. User ka question UI me turant dikha de
+  const userMsg = {
+    _id: Date.now(),
+    senderId: userId,
+    receiverId: adminId,
+    message: userQuestion,
+    createdAt: new Date()
   };
+  setMessages(prev => [...prev, userMsg]);
 
+  try {
+    // 2. Backend ko call kar aur response ka wait kar
+    const res = await axios.post(`${API_URL}/api/messages/ai`, {
+      question: userQuestion,
+      userId: userId
+    });
+
+    // 3. ✅ Backend se jo reply aaya use UI me add kar de
+    const aiMsg = {
+      _id: Date.now() + 1,
+      senderId: adminId, // AI ki taraf se admin reply kar raha
+      receiverId: userId,
+      message: res.data.reply, // Yahi line missing thi
+      createdAt: new Date()
+    };
+    setMessages(prev => [...prev, aiMsg]);
+
+  } catch (err) {
+    console.error("AI error:", err);
+    // Error aane pe bhi user ko bata de
+    const errorMsg = {
+      _id: Date.now() + 2,
+      senderId: adminId,
+      receiverId: userId,
+      message: "AI failed. Check backend logs.",
+      createdAt: new Date()
+    };
+    setMessages(prev => [...prev, errorMsg]);
+  } finally {
+    setAiLoading(false);
+  }
+};const askAI = async () => {
+  if (!text.trim() || !userId || !adminId) return;
+  setAiLoading(true);
+  const userQuestion = text.trim();
+  setText(""); // Input khali kar de
+
+  // 1. User ka question UI me turant dikha de
+  const userMsg = {
+    _id: Date.now(),
+    senderId: userId,
+    receiverId: adminId,
+    message: userQuestion,
+    createdAt: new Date()
+  };
+  setMessages(prev => [...prev, userMsg]);
+
+  try {
+    // 2. Backend ko call kar aur response ka wait kar
+    const res = await axios.post(`${API_URL}/api/messages/ai`, {
+      question: userQuestion,
+      userId: userId
+    });
+
+    // 3. ✅ Backend se jo reply aaya use UI me add kar de
+    const aiMsg = {
+      _id: Date.now() + 1,
+      senderId: adminId, // AI ki taraf se admin reply kar raha
+      receiverId: userId,
+      message: res.data.reply, // Yahi line missing thi
+      createdAt: new Date()
+    };
+    setMessages(prev => [...prev, aiMsg]);
+
+  } catch (err) {
+    console.error("AI error:", err);
+    // Error aane pe bhi user ko bata de
+    const errorMsg = {
+      _id: Date.now() + 2,
+      senderId: adminId,
+      receiverId: userId,
+      message: "AI failed. Check backend logs.",
+      createdAt: new Date()
+    };
+    setMessages(prev => [...prev, errorMsg]);
+  } finally {
+    setAiLoading(false);
+  }
+};
   if (!user) return <div>Please login</div>;
   if (loading) return <div>Loading...</div>;
 
