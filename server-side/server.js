@@ -36,11 +36,14 @@ app.use(express.json());
 // ✅ Socket.io with proper CORS
 const io = new Server(server, {
   cors: {
-    origin: allowedOrigins,
+    origin: [
+      "https://e-commerce-0047.onrender.com"
+    ],
     methods: ["GET", "POST"],
     credentials: true
   },
-  transports: ["websocket", "polling"] // important for Render
+  transports: ["websocket", "polling"],
+  allowEIO3: true   // ✅ ADD THIS (important for compatibility)
 });
 
 // ✅ Attach socket logic

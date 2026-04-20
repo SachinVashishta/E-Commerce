@@ -1,11 +1,16 @@
 import { useEffect, useState, useRef, useCallback } from "react";
 import { useAuth } from "../context/AuthContext";
-import io from "socket.io-client";
+import {io} from "socket.io-client";
 import axios from "axios";
 import './Chat.css';
 
 const API_URL = import.meta.env.VITE_API_URL 
-const socket = io(API_URL);
+const socket = io("https://e-commerce-47.onrender.com", {
+  transports: ["websocket"],   // force websocket
+  withCredentials: true,
+  reconnection: true,
+  reconnectionAttempts: 5
+});
 
 export default function Chat() {
   const { user } = useAuth();
