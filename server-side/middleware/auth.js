@@ -14,6 +14,7 @@ module.exports = {
       res.status(401).json({ message: 'Invalid token' });
     }
   },
+  
   isAdmin: async (req, res, next) => {
     try {
       const token = req.header('Authorization')?.replace('Bearer ', '');
