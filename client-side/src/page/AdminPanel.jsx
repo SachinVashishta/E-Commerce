@@ -8,8 +8,7 @@ import '../styles/responsive.css';
 const AdminPanel = () => {
   const { user } = useAuth();
   const [users, setUsers] = useState([]);
- 
-  
+
   const [newProduct, setNewProduct] = useState({
     title: '',
     brand: '',
@@ -30,9 +29,9 @@ const AdminPanel = () => {
   useEffect(() => {
     if (user?.role === 'admin') {
       fetchAdminData();
-     
+      fetchRecentChats();
     }
-  }, [users]);
+  }, [user]);
 
   const fetchAdminData = async () => {
     try {
@@ -40,7 +39,9 @@ const AdminPanel = () => {
       const usersRes = await axios.get(`${API_URL}/api/admin/users`, {
         headers: { Authorization: `Bearer ${token}` }
       });
-      
+    
+      setUsers(usersRes.data);
+     
     } catch (error) {
       console.error('Error:', error);
     }
