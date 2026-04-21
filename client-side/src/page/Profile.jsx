@@ -12,12 +12,6 @@ const Profile = () => {
   const [profileData, setProfileData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [orders, setOrders] = useState([]);
-  // Profile chat states
-  const [chatMessages, setChatMessages] = useState([]);
-  const [chatText, setChatText] = useState('');
-  const [chatLoading, setChatLoading] = useState(false);
-  const [adminId, setAdminId] = useState(null);
-  const socketRef = useRef(null);
   const userId = user?._id;
 
   useEffect(() => {
@@ -34,23 +28,7 @@ const Profile = () => {
       .catch(err => console.error("Admin ID error", err));
   }, [userId]);
 
-  // Socket connection for profile chat
-  useEffect(() => {
-    if (!userId) return;
-    const socket = io(API_URL, {
-      transports: ["websocket", "polling"],
-      upgrade: true,
-      reconnection: true
-    });
-    socketRef.current = socket;
-    socket.emit("join", { userId });
 
-    socket.on("receiveMessage", (msg) => {
-      setChatMessages(prev => [...prev, msg]);
-    });
-
-    return () => socket.disconnect();
-  }, [userId]);
 
   // Load profile chat history
   useEffect(() => {
@@ -177,34 +155,13 @@ const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
     )}
   </div>
 
-  {/* Chat with Admin */}
-  <div style={{ background: 'white', padding: '2rem', borderRadius: '15px', boxShadow: '0 10px 30px rgba(0,0,0,0.1)', marginTop: '2rem' }}>
-    <h2>💬 Chat with Admin</h2>
-    <div style={{ height: '400px', overflowY: 'auto', border: '1px solid #eee', padding: '1rem', marginBottom: '1rem', borderRadius: '10px' }}>
-      No messages yet. Send one below!
-    </div>
-    <div className="chat-messages" style={{ height: '300px', overflowY: 'auto', border: '1px solid #eee', padding: '1rem', marginBottom: '1rem', borderRadius: '10px', background: '#f9f9f9' }}>
-      {chatLoading ? (
-        <div>Loading messages...</div>
-      ) : chatMessages.map(msg => (
-        <div key={msg._id} className={`message ${msg.senderId === userId ? 'sent' : 'received'}`} style={{ marginBottom: '0.5rem', padding: '0.5rem', borderRadius: '8px', maxWidth: '80%' }}>
-          <div>{msg.message}</div>
-          <small style={{ opacity: 0.7 }}>{new Date(msg.createdAt).toLocaleTimeString()}</small>
-        </div>
-      ))}
-    </div>
-    <form onSubmit={sendProfileMessage} style={{ display: 'flex', gap: '1rem' }}>
-      <input 
-        style={{ flex: 1, padding: '0.75rem', border: '1px solid #ddd', borderRadius: '8px' }} 
-        value={chatText}
-        onChange={(e) => setChatText(e.target.value)}
-        placeholder="Type message to admin..."
-        disabled={!adminId}
-      />
-      <button type="submit" style={{ padding: '0.75rem 1.5rem', background: '#667eea', color: 'white', border: 'none', borderRadius: '8px' }} disabled={!chatText.trim() || !adminId}>
-        Send
-      </button>
-    </form>
+  {/* Contact Admin: Simple link */}
+  <div style={{ background: 'white', padding: '2rem', borderRadius: '15px', boxShadow: '0 10px 30px rgba(0,0,0,0.1)', marginTop: '2rem', textAlign: 'center' }}>
+    <h2>💬 Support</h2>
+    <Link to="/chat" style={{ display: 'inline-block', padding: '1rem 2rem', background: '#667eea', color: 'white', textDecoration: 'none', borderRadius: '10px', fontSize: '1.1rem' }}>
+      Open Live Chat
+    </Link>
+    <p style={{ marginTop: '1rem', color: '#666' }}>Messages with Admin & AI Assistant</p>
   </div>
 </div>
   );

@@ -9,10 +9,6 @@ import Cart from './page/Cart';
 import Login from './page/Login';
 import Profile from './page/Profile';
 import AdminPanel from './page/AdminPanel';
-import Chat from './components/Chat';
-
-
-
 function App() {
   return (
     <AuthProvider>
@@ -28,7 +24,7 @@ function App() {
               <Route path="/profile" element={<Profile />} />
               <Route path="/admin" element={<AdminPanel />} />
               <Route path="/chat" element={<Chat />} />
-            
+              <Route path="/admin-chat" element={<AdminChat />} />
             </Routes>
           </div>
         </Router>

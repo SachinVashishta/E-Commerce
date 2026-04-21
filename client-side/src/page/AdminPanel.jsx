@@ -212,16 +212,6 @@ const AdminPanel = () => {
               <span className={`status-badge ${u.role === 'admin' ? 'status-resolved' : 'status-pending'}`}>
                 {u.role.toUpperCase()}
               </span>
-              <Link to={`/chat?userId=${u._id}`} style={{ 
-                display: 'inline-block', 
-                padding: '0.5rem 1rem', 
-                background: '#28a745', 
-                color: 'white', 
-                textDecoration: 'none', 
-                borderRadius: '6px',
-                fontSize: '0.8rem',
-                marginTop: '0.5rem'
-              }}>💬 Chat</Link>
             </div>
           ))}
         </div>
@@ -247,16 +237,7 @@ const AdminPanel = () => {
               <div style={{ marginTop: '0.5rem', fontSize: '0.9rem', color: '#666' }}>
                 {chat.lastMessage?.substring(0, 50)}...
               </div>
-              <Link to={`/chat?userId=${chat._id}`} style={{ 
-                display: 'inline-block', 
-                padding: '0.5rem 1rem', 
-                background: '#667eea', 
-                color: 'white', 
-                textDecoration: 'none', 
-                borderRadius: '6px',
-                fontSize: '0.9rem',
-                marginTop: '0.5rem'
-              }}>📱 View Chat</Link>
+              Last msg: {chat.lastMessage?.substring(0, 50)}...
             </div>
           ))}
         </div>
@@ -269,7 +250,7 @@ const AdminPanel = () => {
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {queries.map(q => (
-            <div key={q._id} className="query-item" style={{ cursor: 'pointer' }} onClick={() => window.open(`/chat?userId=${q.senderId || q._id}`, '_blank')}>
+            <div key={q._id} className="query-item">
               <div>
                 <strong>{q.email}:</strong> {q.message.substring(0, 100)}...
               </div>
