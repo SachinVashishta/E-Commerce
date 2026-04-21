@@ -11,6 +11,7 @@ import Profile from './page/Profile';
 import AdminPanel from './page/AdminPanel';
 import ChatPage from './page/ChatPage';
 import Chat from './components/Chat';
+import AIChat from './page/AIChat';
 function App() {
   return (
     <AuthProvider>
