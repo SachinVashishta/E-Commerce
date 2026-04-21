@@ -9,9 +9,10 @@ import Cart from './page/Cart';
 import Login from './page/Login';
 import Profile from './page/Profile';
 import AdminPanel from './page/AdminPanel';
-import ChatPage from './page/ChatPage';
-import Chat from './components/Chat';
+import UserChat from './page/UserChat';
+import AdminChat from './page/AdminChat';
 import AIChat from './page/AIChat';
+
 function App() {
   return (
     <AuthProvider>
@@ -26,9 +27,11 @@ function App() {
               <Route path="/login" element={<Login />} />
               <Route path="/profile" element={<Profile />} />
               <Route path="/admin" element={<AdminPanel />} />
-<Route path="/chat" element={<Chat/>} />
-              <Route path="/chat/:userId" element={<ChatPage />} />
-<Route path="/ai" element={<AIChat />} />
+              <Route path="/chat" element={<UserChat />} />
+              <Route path="/admin-chat" element={<AdminChat />} />
+              <Route path="/admin-chat/:userId" element={<AdminChat />} />
+              <Route path="/ai" element={<AIChat />} />
+
 
 
             </Routes>
