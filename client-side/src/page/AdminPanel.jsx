@@ -9,6 +9,7 @@ const AdminPanel = () => {
   const { user } = useAuth();
   const [users, setUsers] = useState([]);
  
+  
   const [newProduct, setNewProduct] = useState({
     title: '',
     brand: '',
@@ -31,7 +32,7 @@ const AdminPanel = () => {
       fetchAdminData();
      
     }
-  }, [user]);
+  }, [users]);
 
   const fetchAdminData = async () => {
     try {
