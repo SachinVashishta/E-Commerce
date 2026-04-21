@@ -9,7 +9,6 @@ import Cart from './page/Cart';
 import Login from './page/Login';
 import Profile from './page/Profile';
 import AdminPanel from './page/AdminPanel';
-
 import ChatPage from './page/ChatPage';
 function App() {
   return (
@@ -25,8 +24,7 @@ function App() {
               <Route path="/login" element={<Login />} />
               <Route path="/profile" element={<Profile />} />
               <Route path="/admin" element={<AdminPanel />} />
-              <Route path="/chat" element={ <ChatPage/>} />
-              <Route path="/admin-chat" element={<AdminChat />} />
+              <Route path="/chat-admin" element={ <ChatPage/>} />
             </Routes>
           </div>
         </Router>
