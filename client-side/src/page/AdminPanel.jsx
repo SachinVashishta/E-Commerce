@@ -8,8 +8,7 @@ import '../styles/responsive.css';
 const AdminPanel = () => {
   const { user } = useAuth();
   const [users, setUsers] = useState([]);
-  const [queries, setQueries] = useState([]);
-  const [recentChats, setRecentChats] = useState([]);
+ 
   const [newProduct, setNewProduct] = useState({
     title: '',
     brand: '',
@@ -30,7 +29,7 @@ const AdminPanel = () => {
   useEffect(() => {
     if (user?.role === 'admin') {
       fetchAdminData();
-      fetchRecentChats();
+     
     }
   }, [user]);
 
@@ -40,27 +39,13 @@ const AdminPanel = () => {
       const usersRes = await axios.get(`${API_URL}/api/admin/users`, {
         headers: { Authorization: `Bearer ${token}` }
       });
-      const queriesRes = await axios.get(`${API_URL}/api/messages/admin/queries`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      setUsers(usersRes.data);
-      setQueries(queriesRes.data);
+      
     } catch (error) {
       console.error('Error:', error);
     }
   };
 
-  const fetchRecentChats = async () => {
-    try {
-      const token = localStorage.getItem('token');
-      const res = await axios.get(`${API_URL}/api/messages/recent`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      setRecentChats(res.data);
-    } catch (error) {
-      console.error('Chats fetch error:', error);
-    }
-  };
+
 
   const handleInputChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -218,51 +203,12 @@ const AdminPanel = () => {
         </div>
       </div>
 
-      {/* Live Chats */}
-      <div className="pro-chats-section">
-        <div className="flex flex-col sm:flex-row justify-between items-center gap-4 mb-8">
-          <h2 className="text-2xl font-bold">💬 Live Chats ({recentChats.length})</h2>
-        </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-{recentChats.map(chat => (
-            <div key={chat._id} className="chat-item" style={{ cursor: 'pointer' }} onClick={() => window.location.href = `/chat/${chat._id}`}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                <div style={{ width: '50px', height: '50px', background: '#4f46e5', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontWeight: 'bold', fontSize: '1.2rem' }}>
-                  {chat.user?.email?.[0]?.toUpperCase() || 'U'}
-                </div>
-                <div>
-                  <div style={{ fontWeight: '600' }}>{chat.user?.email || 'Unknown'}</div>
-                  <small>{chat.count} msgs</small>
-                </div>
-              </div>
-              <div style={{ marginTop: '0.5rem', fontSize: '0.9rem', color: '#666' }}>
-                {chat.lastMessage?.substring(0, 50)}...
-              </div>
-            </div>
-          ))}
+     
 
-        </div>
+    
+      
       </div>
-
-      {/* Queries */}
-      <div className="pro-queries-section">
-        <div className="flex flex-col sm:flex-row justify-between items-center gap-4 mb-8">
-          <h2 className="text-2xl font-bold">📝 Queries ({queries.length})</h2>
-        </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {queries.map(q => (
-            <div key={q._id} className="query-item">
-              <div>
-                <strong>{q.email}:</strong> {q.message.substring(0, 100)}...
-              </div>
-              <span className={`status-badge ${q.status === 'resolved' ? 'status-resolved' : 'status-pending'}`}>
-                {q.status.toUpperCase()}
-              </span>
-            </div>
-          ))}
-        </div>
-      </div>
-    </div>
+    
   );
 };
 

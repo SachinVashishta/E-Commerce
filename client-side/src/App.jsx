@@ -10,10 +10,6 @@ import Login from './page/Login';
 import Profile from './page/Profile';
 import AdminPanel from './page/AdminPanel';
 
-// import AdminChat from './page/AdminChat';
-// import AIChat from './page/AIChat';
-// import Chat from './components/Chat';
-import SimpleChat from './page/SimpleChat';
 
 function App() {
   return (
@@ -29,9 +25,7 @@ function App() {
               <Route path="/login" element={<Login />} />
               <Route path="/profile" element={<Profile />} />
               <Route path="/admin" element={<AdminPanel />} />
-              <Route path="/chat" element={<SimpleChat />} />
-              <Route path="/admin-chat/:userId" element={<SimpleChat />} />
-              {/* <Route path="/ai" element={<AIChat />} /> */}
+             
 
 
 

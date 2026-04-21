@@ -60,9 +60,7 @@ const Nav = () => {
           
         {user ? (
             <>
-<Link to="/chat">💬 Chat</Link>
-              <Link to="/ai">🤖 AI</Link>
-
+             
               <Link to="/profile">👤 Profile</Link>
               {user.role === 'admin' && <Link to="/admin">⚙️ Admin</Link>}
             </>
@@ -84,11 +82,10 @@ const Nav = () => {
 
       <div className={`mobile-menu ${isMenuOpen ? 'active' : ''}`}>
         <Link to="/" onClick={closeMenu}>🏠 Home</Link>
-        
+       
         {user ? (
           <>
             <Link to="/profile" onClick={closeMenu}>👤 Profile</Link>
-            <Link to="/chat1" onClick={closeMenu}>💬 Chat</Link>
             {user.role === 'admin' && <Link to="/admin" onClick={closeMenu}>⚙️ Admin</Link>}
 
           </>

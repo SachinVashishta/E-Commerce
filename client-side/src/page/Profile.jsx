@@ -124,14 +124,7 @@ const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
     )}
   </div>
 
-  {/* Contact Admin: Simple link */}
-  <div style={{ background: 'white', padding: '2rem', borderRadius: '15px', boxShadow: '0 10px 30px rgba(0,0,0,0.1)', marginTop: '2rem', textAlign: 'center' }}>
-    <h2>💬 Support</h2>
-    <Link to="/chat" style={{ display: 'inline-block', padding: '1rem 2rem', background: '#667eea', color: 'white', textDecoration: 'none', borderRadius: '10px', fontSize: '1.1rem' }}>
-      Open Live Chat
-    </Link>
-    <p style={{ marginTop: '1rem', color: '#666' }}>Messages with Admin & AI Assistant</p>
-  </div>
+
 </div>
   );
 };
