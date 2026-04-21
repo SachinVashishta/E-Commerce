@@ -28,7 +28,7 @@ function App() {
               <Route path="/profile" element={<Profile />} />
               <Route path="/admin" element={<AdminPanel />} />
               <Route path="/chat" element={<UserChat />} />
-              <Route path="/admin-chat" element={<AdminChat />} />
+            
               <Route path="/admin-chat/:userId" element={<AdminChat />} />
               <Route path="/ai" element={<AIChat />} />
 
