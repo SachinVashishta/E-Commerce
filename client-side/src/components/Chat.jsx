@@ -13,7 +13,7 @@ export default function Chat() {
       const [loading, setLoading] = useState(false);
       const [adminId, setAdminId] = useState(null);
       const [targetUserId, setTargetUserId] = useState(null);
-      const [chattingWith, setChattingWith] = useState('Admin & AI');
+  const [chattingWith, setChattingWith] = useState('all'); // 'all' | 'admin' | 'ai'
       const [aiLoading, setAiLoading] = useState(false);
       const socketRef = useRef(null);
       const userId = user?._id;  // Parse URL for admin chat with specific user\n  useEffect(() => {\n    const urlParams = new URLSearchParams(window.location.search);\n    const targetId = urlParams.get('userId');\n    if (targetId && user?.role === 'admin') {\n      setTargetUserId(targetId);\n      setChattingWith('User Chat');\n    }\n  }, []);
@@ -127,26 +127,34 @@ export default function Chat() {
 
   return (
     <div className="chat-container">
-      <div className="chat-header">
-        <h2>💬 Support Chat</h2>
-        <p>Messages with Admin & AI</p>
-      </div>
+  <div className="chat-header">
+    <h2>💬 Support Chat</h2>
+    <div style={{ marginBottom: '1rem' }}>
+      <button onClick={() => setChattingWith('all')} style={{ marginRight: '0.5rem', padding: '0.5rem 1rem', background: chattingWith === 'all' ? '#667eea' : '#eee', color: chattingWith === 'all' ? 'white' : 'black' }}>All</button>
+      <button onClick={() => setChattingWith('admin')} style={{ marginRight: '0.5rem', padding: '0.5rem 1rem', background: chattingWith === 'admin' ? '#667eea' : '#eee', color: chattingWith === 'admin' ? 'white' : 'black' }}>Admin</button>
+      <button onClick={() => setChattingWith('ai')} style={{ padding: '0.5rem 1rem', background: chattingWith === 'ai' ? '#667eea' : '#eee', color: chattingWith === 'ai' ? 'white' : 'black' }}>AI</button>
+    </div>
+  </div>
 
-      <div className="chat-messages">
-        {messages.map(msg => (
-          <div key={msg._id} className={`message ${msg.senderId === userId ? 'sent' : 'received'}`}>
-            <div>{msg.message}</div>
-            <div className="message-time">
-              {new Date(msg.createdAt).toLocaleTimeString()}
-            </div>
-          </div>
-        ))}
-        {aiLoading && (
-          <div className="message received">
-            <div>🤖 AI is thinking...</div>
-          </div>
-        )}
+  <div className="chat-messages">
+    {messages.filter(msg => {
+      if (chattingWith === 'admin') return msg.senderId !== adminId || msg.message.includes('AI'); // Show admin non-AI
+      if (chattingWith === 'ai') return msg.senderId === adminId && msg.message.includes('AI'); // AI msgs
+      return true; // all
+    }).map(msg => (
+      <div key={msg._id} className={`message ${msg.senderId === userId ? 'sent' : 'received'}`}>
+        <div>{msg.message}</div>
+        <div className="message-time">
+          {new Date(msg.createdAt).toLocaleTimeString()}
+        </div>
       </div>
+    ))}
+    {aiLoading && chattingWith !== 'admin' && (
+      <div className="message received">
+        <div>🤖 AI is thinking...</div>
+      </div>
+    )}
+  </div>
 
       <form className="chat-input-container" onSubmit={sendMessage}>
         <input 
