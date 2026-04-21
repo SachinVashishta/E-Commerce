@@ -238,7 +238,7 @@ const handleDelete = async () => {
                         style={{flex: 1, padding: '8px', border: '1px solid #ccc', borderRadius: '4px'}}
                         type="url"
                         placeholder="Image URL"
-                        value={editForm.image || product.image || ''}
+                        value={editForm.image || product.image || ""}
                         onChange={(e) => setEditForm({...editForm, image: e.target.value})}
                       />
                     </div>
