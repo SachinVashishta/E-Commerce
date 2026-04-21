@@ -9,7 +9,7 @@ import Cart from './page/Cart';
 import Login from './page/Login';
 import Profile from './page/Profile';
 import AdminPanel from './page/AdminPanel';
-import UserChat from './page/UserChat';
+
 import AdminChat from './page/AdminChat';
 import AIChat from './page/AIChat';
 import Chat from './components/Chat';
