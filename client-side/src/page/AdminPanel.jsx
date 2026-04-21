@@ -40,7 +40,7 @@ const AdminPanel = () => {
       const usersRes = await axios.get(`${API_URL}/api/admin/users`, {
         headers: { Authorization: `Bearer ${token}` }
       });
-      const queriesRes = await axios.get(`${API_URL}/api/admin/queries`, {
+      const queriesRes = await axios.get(`${API_URL}/api/messages/admin/queries`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setUsers(usersRes.data);
@@ -212,6 +212,16 @@ const AdminPanel = () => {
               <span className={`status-badge ${u.role === 'admin' ? 'status-resolved' : 'status-pending'}`}>
                 {u.role.toUpperCase()}
               </span>
+              <Link to={`/chat?userId=${u._id}`} style={{ 
+                display: 'inline-block', 
+                padding: '0.5rem 1rem', 
+                background: '#28a745', 
+                color: 'white', 
+                textDecoration: 'none', 
+                borderRadius: '6px',
+                fontSize: '0.8rem',
+                marginTop: '0.5rem'
+              }}>💬 Chat</Link>
             </div>
           ))}
         </div>
@@ -259,7 +269,7 @@ const AdminPanel = () => {
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {queries.map(q => (
-            <div key={q._id} className="query-item">
+            <div key={q._id} className="query-item" style={{ cursor: 'pointer' }} onClick={() => window.open(`/chat?userId=${q.senderId || q._id}`, '_blank')}>
               <div>
                 <strong>{q.email}:</strong> {q.message.substring(0, 100)}...
               </div>

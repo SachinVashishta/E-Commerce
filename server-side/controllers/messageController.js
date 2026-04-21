@@ -71,7 +71,7 @@ const saveMessage = async (data) => {
   }
 };
 
-// ADMIN RECENT CHATS
+// ADMIN RECENT CHATS - Enhanced w/ clear sender email
 const getRecentMessages = async (req, res) => {
   try {
     const admin = await User.findOne({ role: 'admin' });
@@ -93,7 +93,8 @@ const getRecentMessages = async (req, res) => {
           from: 'users',
           localField: '_id',
           foreignField: '_id',
-          as: 'user'
+          as: 'user',
+          pipeline: [{ $project: { email: 1, role: 1 } }]
         }
       },
       { $unwind: { path: '$user', preserveNullAndEmptyArrays: true } },
@@ -108,4 +109,67 @@ const getRecentMessages = async (req, res) => {
   }
 };
 
-module.exports = { getMessages, getAIResponse, saveMessage, getRecentMessages };
+// Profile messages (same logic as getMessages)
+const getProfileMessages = async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const admin = await User.findOne({ role: "admin" });
+    if (!admin) return res.status(200).json([]);
+
+    const messages = await Message.find({
+      $or: [
+        { senderId: userId, receiverId: admin._id },
+        { senderId: admin._id, receiverId: userId }
+      ]
+    })
+    .populate('senderId', 'email role')
+    .populate('receiverId', 'email role')
+    .sort({ createdAt: 1 })
+    .limit(100);
+
+    res.status(200).json(messages);
+  } catch (error) {
+    console.error("❌ Get profile messages error:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+// Admin queries = recent user->admin messages (w/ sender emails)
+const getAdminQueries = async (req, res) => {
+  try {
+    const admin = await User.findOne({ role: 'admin' });
+    if (!admin) return res.status(404).json({ message: 'Admin not found' });
+
+    const queries = await Message.aggregate([
+      { $match: { receiverId: admin._id } },
+      {
+        $lookup: {
+          from: 'users',
+          localField: 'senderId',
+          foreignField: '_id',
+          as: 'sender',
+          pipeline: [{ $project: { email: 1 } }]
+        }
+      },
+      { $unwind: { path: '$sender', preserveNullAndEmptyArrays: true } },
+      { $sort: { createdAt: -1 } },
+      { $limit: 20 },
+      {
+        $project: {
+          _id: 1,
+          message: { $substr: ['$message', 0, 100] },
+          email: { $ifNull: ['$sender.email', 'Unknown'] },
+          createdAt: 1,
+          status: { $cond: [{ $eq: ['$senderId', admin._id] }, 'resolved', 'pending'] }
+        }
+      }
+    ]);
+
+    res.json(queries);
+  } catch (error) {
+    console.error('Queries error:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
+};
+
+module.exports = { getMessages, getAIResponse, saveMessage, getRecentMessages, getProfileMessages, getAdminQueries };

@@ -48,21 +48,16 @@ message: cleanText
         }
 
         // ✅ AI auto-reply (simple, non-admin only)
-        if (senderId !== "admin") {
+        // AI auto-reply only for user→admin (admin manual msgs don't trigger AI)
+        const adminUser = await User.findOne({ role: "admin" });
+        if (receiverId.toString() === adminUser._id.toString() && senderId.toString() !== adminUser._id.toString()) {
           const aiText = await generateAIResponse(cleanText);
-          const admin = await User.findOne({ role: "admin" });
-                    if (!admin) return;
-                    
           const aiMessage = await Message.create({
-            senderId: admin._id,
-             receiverId: senderId,
-              message: aiText
+            senderId: adminUser._id,
+            receiverId: senderId,
+            message: aiText
           });
-
           socket.emit("receiveMessage", aiMessage);
-          if (receiverSocket) {
-            io.to(receiverSocket).emit("receiveMessage", aiMessage);
-          }
           console.log(`✅ AI replied to ${senderId}`);
         }
 

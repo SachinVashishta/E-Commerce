@@ -2,7 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useCart } from '../context/CardContext';
+import { useEffect, useState, useRef } from 'react';
 import axios from 'axios';
+import { io } from 'socket.io-client';
+import Chat from '../components/Chat';
 
 const Profile = () => {
   const { user, logout } = useAuth();
@@ -90,36 +93,48 @@ const API_URL = import.meta.env.VITE_API_URL;
         </div>
       </div>
 
-      {/* Order History */}
-      <div style={{ background: 'white', padding: '2rem', borderRadius: '15px', boxShadow: '0 10px 30px rgba(0,0,0,0.1)' }}>
-        <h2>📋 Order History ({orders.length})</h2>
-        {orders.length === 0 ? (
-          <p style={{ color: '#666' }}>No orders yet. <Link to="/cart" style={{ color: '#667eea' }}>Shop now!</Link></p>
-        ) : (
-          <div style={{ display: 'grid', gap: '1rem' }}>
-            {orders.slice(0, 5).map(order => (
-              <div key={order._id} style={{ padding: '1.5rem', background: '#f8f9fa', borderRadius: '10px' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
-                  <strong>Order #{order._id.slice(-6)}</strong>
-                  <span>${order.total.toFixed(2)}</span>
+  {/* Order History */}
+  <div style={{ background: 'white', padding: '2rem', borderRadius: '15px', boxShadow: '0 10px 30px rgba(0,0,0,0.1)' }}>
+    <h2>📋 Order History ({orders.length})</h2>
+    {orders.length === 0 ? (
+      <p style={{ color: '#666' }}>No orders yet. <Link to="/cart" style={{ color: '#667eea' }}>Shop now!</Link></p>
+    ) : (
+      <div style={{ display: 'grid', gap: '1rem' }}>
+        {orders.slice(0, 5).map(order => (
+          <div key={order._id} style={{ padding: '1.5rem', background: '#f8f9fa', borderRadius: '10px' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
+              <strong>Order #{order._id.slice(-6)}</strong>
+              <span>${order.total.toFixed(2)}</span>
+            </div>
+            <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
+              {order.items.map(item => (
+                <div key={item._id} style={{ textAlign: 'center', minWidth: '80px' }}>
+                  <img src={item.image} alt={item.title} style={{ width: '40px', height: '40px', borderRadius: '5px', objectFit: 'cover' }} />
+                  <small>{item.title.slice(0,15)}...</small>
+                  <div>x{item.quantity}</div>
                 </div>
-                <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
-                  {order.items.map(item => (
-                    <div key={item._id} style={{ textAlign: 'center', minWidth: '80px' }}>
-                      <img src={item.image} alt={item.title} style={{ width: '40px', height: '40px', borderRadius: '5px', objectFit: 'cover' }} />
-                      <small>{item.title.slice(0,15)}...</small>
-                      <div>x{item.quantity}</div>
-                    </div>
-                  ))}
-                </div>
-                <small style={{ color: '#666' }}>{new Date(order.createdAt).toLocaleDateString()}</small>
-              </div>
-            ))}
-            {orders.length > 5 && <p style={{ textAlign: 'center', color: '#666' }}>...</p>}
+              ))}
+            </div>
+            <small style={{ color: '#666' }}>{new Date(order.createdAt).toLocaleDateString()}</small>
           </div>
-        )}
+        ))}
+        {orders.length > 5 && <p style={{ textAlign: 'center', color: '#666' }}>...</p>}
       </div>
+    )}
+  </div>
+
+  {/* Chat with Admin */}
+  <div style={{ background: 'white', padding: '2rem', borderRadius: '15px', boxShadow: '0 10px 30px rgba(0,0,0,0.1)', marginTop: '2rem' }}>
+    <h2>💬 Chat with Admin</h2>
+    <div style={{ height: '400px', overflowY: 'auto', border: '1px solid #eee', padding: '1rem', marginBottom: '1rem', borderRadius: '10px' }}>
+      No messages yet. Send one below!
     </div>
+    <form style={{ display: 'flex', gap: '1rem' }}>
+      <input style={{ flex: 1, padding: '0.75rem', border: '1px solid #ddd', borderRadius: '8px' }} placeholder="Type message to admin..." />
+      <button type="submit" style={{ padding: '0.75rem 1.5rem', background: '#667eea', color: 'white', border: 'none', borderRadius: '8px' }}>Send</button>
+    </form>
+  </div>
+</div>
   );
 };
 
