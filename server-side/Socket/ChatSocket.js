@@ -1,5 +1,6 @@
-// sockets/chatSocket.js
+const User = require("../models/User");
 const Message = require("../models/Message");
+
 const { generateAIResponse } = require("../controllers/aiController");
 const mongoose = require('mongoose');
 

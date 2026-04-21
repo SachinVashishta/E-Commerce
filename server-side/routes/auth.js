@@ -10,5 +10,8 @@ router.get('/profile', protect.protect, (req, res) => {
   res.json(req.user);
 });
 
+router.get('/admin-id', protect.protect, authController.getAdminId);
+
+
 module.exports = router;
 

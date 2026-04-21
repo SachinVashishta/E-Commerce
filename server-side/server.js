@@ -53,34 +53,9 @@ const io = new Server(server, {
   allowEIO3: true
 });
 
-// ✅ SOCKET LOGIC YAHI LIKH DE - ChatSocket.js delete kar de
-io.on('connection', (socket) => {
-  console.log('User connected:', socket.id);
+const ChatSocket = require('./Socket/ChatSocket');
+ChatSocket(io);
 
-  socket.on('join', ({ userId }) => {
-    socket.join(userId);
-    console.log(`User ${userId} joined room`);
-  });
-
-  socket.on('sendMessage', async (data) => {
-    try {
-      // 1. DB me save karo
-      const savedMsg = await saveMessage(data);
-      
-      // 2. Sender aur receiver dono ko bhejo
-      if (savedMsg) {
-        io.to(data.senderId).emit('receiveMessage', savedMsg);
-        io.to(data.receiverId).emit('receiveMessage', savedMsg);
-      }
-    } catch (error) {
-      console.error("Socket sendMessage error:", error);
-    }
-  });
-
-  socket.on('disconnect', () => {
-    console.log('User disconnected:', socket.id);
-  });
-});
 
 // ✅ Routes
 app.use('/api/auth', authRouter);

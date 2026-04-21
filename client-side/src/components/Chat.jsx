@@ -1,177 +1,143 @@
-import { useEffect, useState, useRef } from "react";
-import { useAuth } from "../context/AuthContext";
-import { io } from "socket.io-client";
-import axios from "axios";
-import './Chat.css';
+import React, { useEffect, useState, useRef } from 'react';
+import { useAuth } from '../context/AuthContext';
+import axios from 'axios';
+import { io } from 'socket.io-client';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
-export default function Chat() {
-    const { user } = useAuth();
-      const [messages, setMessages] = useState([]);
-      const [text, setText] = useState("");
-      const [loading, setLoading] = useState(false);
-      const [adminId, setAdminId] = useState(null);
-      const [targetUserId, setTargetUserId] = useState(null);
-  const [chattingWith, setChattingWith] = useState('all'); // 'all' | 'admin' | 'ai'
-      const [aiLoading, setAiLoading] = useState(false);
-      const socketRef = useRef(null);
-      const userId = user?._id;  // Parse URL for admin chat with specific user\n  useEffect(() => {\n    const urlParams = new URLSearchParams(window.location.search);\n    const targetId = urlParams.get('userId');\n    if (targetId && user?.role === 'admin') {\n      setTargetUserId(targetId);\n      setChattingWith('User Chat');\n    }\n  }, []);
+const Chat = ({ targetUserId, partnerEmail, title = 'Chat' }) => {
+  const { user } = useAuth();
+  const [messages, setMessages] = useState([]);
+  const [text, setText] = useState('');
+  const [loading, setLoading] = useState(true);
+  const socketRef = useRef();
+  const messagesEndRef = useRef(null);
+  const userId = user?._id;
+  const adminId = targetUserId || 'admin-placeholder'; // Will be set dynamically
+  const receiverId = user?.role === 'admin' ? targetUserId : adminId;
+  const senderId = userId;
 
-  // 1. Get admin ID
+  // Get admin ID
+  const [adminIdState, setAdminIdState] = useState(null);
   useEffect(() => {
-    if (!userId) {
-      setLoading(false);
-      return;
+    if (user?.role !== 'admin') {
+      axios.get(`${API_URL}/api/auth/admin-id`, {
+        headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+      }).then(res => {
+        setAdminIdState(res.data.adminId);
+      }).catch(err => console.error('Admin ID fetch error', err));
     }
-    axios.get(`${API_URL}/api/users/admin-id`)
-    .then(res => setAdminId(res.data.adminId))
-    .catch(err => console.error("Admin ID error", err));
-  }, [userId]);
+  }, []);
 
-  // 2. Socket connection
+  const currentReceiverId = user?.role === 'admin' ? targetUserId : adminIdState;
+
+  // Load messages
   useEffect(() => {
-    if (!userId) return;
-    const socket = io(API_URL, { transports: ["websocket","polling"],
-      upgrade: true,
-      reconnection: true,
-      reconnectionAttempts: 5,
-      reconnectionDelay: 5000,
-      timeout: 20000,
-     });
-    socketRef.current = socket;
-    socket.emit("join", { userId });
+    if (!currentReceiverId || !userId) return;
+    setLoading(true);
+    const endpoint = user.role === 'admin' ? `${API_URL}/api/messages/${targetUserId}` : `${API_URL}/api/messages/profile/${userId}`;
+    axios.get(endpoint, {
+      headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+    }).then(res => {
+      setMessages(res.data || []);
+    }).catch(err => console.error('Messages load error', err))
+    .finally(() => setLoading(false));
+  }, [currentReceiverId, userId, targetUserId]);
 
-    socket.on("receiveMessage", (msg) => {
-      setMessages(prev => [...prev, msg]);
+  // Socket setup
+  useEffect(() => {
+    if (!currentReceiverId) return;
+
+    socketRef.current = io(API_URL);
+    
+    socketRef.current.emit('join', { userId: userId });
+
+    socketRef.current.on('messageSent', (message) => {
+      if (message.senderId.toString() === userId) {
+        setMessages(prev => [...prev, message]);
+      }
     });
 
-    return () => socket.disconnect();
-  }, [userId]);
+    socketRef.current.on('receiveMessage', (message) => {
+      setMessages(prev => [...prev, message]);
+    });
 
-  // 3. Load past messages
+    return () => {
+      socketRef.current?.disconnect();
+    };
+  }, [currentReceiverId, userId]);
+
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  };
+
   useEffect(() => {
-    if (!userId) return;
-    setLoading(true);
-    axios.get(`${API_URL}/api/messages/${userId}`)
-    .then(res => setMessages(res.data || []))
-    .catch(err => console.error("Load error:", err))
-    .finally(() => setLoading(false));
-  }, [userId]);
+    scrollToBottom();
+  }, [messages]);
 
-  // 4. Send to admin
   const sendMessage = (e) => {
     e.preventDefault();
-    if (!text.trim() || !userId || !adminId) return;
+    if (!text.trim() || !currentReceiverId) return;
 
-    const messageData = {
+    socketRef.current.emit('sendMessage', {
       senderId: userId,
-      receiverId: adminId,
-      message: text.trim()
-    };
-
-    socketRef.current.emit("sendMessage", messageData);
-    setText("");
+      receiverId: currentReceiverId,
+      text: text.trim()
+    });
+    setText('');
   };
 
-  // 5. Ask AI (fixed - no duplicate code)
-  const askAI = async () => {
-    if (!text.trim() || !userId || !adminId) return;
-    setAiLoading(true);
-    const userQuestion = text.trim();
-    setText("");
-
-    // Show user message immediately
-    const userMsg = {
-      _id: Date.now(),
-      senderId: userId,
-      receiverId: adminId,
-      message: userQuestion,
-      createdAt: new Date()
-    };
-    setMessages(prev => [...prev, userMsg]);
-
-    try {
-      const res = await axios.post(`${API_URL}/api/messages/ai`, {
-        question: userQuestion,
-        userId: userId
-      });
-
-      // Show AI reply
-      const aiMsg = {
-        _id: Date.now() + 1,
-        senderId: adminId,
-        receiverId: userId,
-        message: res.data.reply,
-        createdAt: new Date()
-      };
-      setMessages(prev => [...prev, aiMsg]);
-
-    } catch (err) {
-      console.error("AI error:", err);
-      const errorMsg = {
-        _id: Date.now() + 2,
-        senderId: adminId,
-        receiverId: userId,
-        message: "AI failed. Try again.",
-        createdAt: new Date()
-      };
-      setMessages(prev => [...prev, errorMsg]);
-    } finally {
-      setAiLoading(false);
-    }
-  };
-
-  if (!user) return <div className="error">Please login</div>;
-  if (loading) return <div className="loading">Loading chat...</div>;
+  if (loading) return <div className="chat-loading">Loading chat...</div>;
 
   return (
     <div className="chat-container">
-  <div className="chat-header">
-    <h2>💬 Support Chat</h2>
-    <div style={{ marginBottom: '1rem' }}>
-      <button onClick={() => setChattingWith('all')} style={{ marginRight: '0.5rem', padding: '0.5rem 1rem', background: chattingWith === 'all' ? '#667eea' : '#eee', color: chattingWith === 'all' ? 'white' : 'black' }}>All</button>
-      <button onClick={() => setChattingWith('admin')} style={{ marginRight: '0.5rem', padding: '0.5rem 1rem', background: chattingWith === 'admin' ? '#667eea' : '#eee', color: chattingWith === 'admin' ? 'white' : 'black' }}>Admin</button>
-      <button onClick={() => setChattingWith('ai')} style={{ padding: '0.5rem 1rem', background: chattingWith === 'ai' ? '#667eea' : '#eee', color: chattingWith === 'ai' ? 'white' : 'black' }}>AI</button>
-    </div>
-  </div>
-
-  <div className="chat-messages">
-    {messages.filter(msg => {
-      if (chattingWith === 'admin') return msg.senderId !== adminId || msg.message.includes('AI'); // Show admin non-AI
-      if (chattingWith === 'ai') return msg.senderId === adminId && msg.message.includes('AI'); // AI msgs
-      return true; // all
-    }).map(msg => (
-      <div key={msg._id} className={`message ${msg.senderId === userId ? 'sent' : 'received'}`}>
-        <div>{msg.message}</div>
-        <div className="message-time">
-          {new Date(msg.createdAt).toLocaleTimeString()}
-        </div>
+      <div className="chat-header">
+        <h3>{title}</h3>
+        {partnerEmail && <p>With: {partnerEmail}</p>}
       </div>
-    ))}
-    {aiLoading && chattingWith !== 'admin' && (
-      <div className="message received">
-        <div>🤖 AI is thinking...</div>
+      
+      <div className="chat-messages">
+        {messages.map((msg, idx) => (
+          <div key={msg._id || idx} className={`message ${msg.senderId.toString() === userId ? 'sent' : 'received'}`}>
+            <div className="message-content">
+              <strong>{msg.senderId.email || 'User'}</strong>
+              <p>{msg.message}</p>
+              <small>{new Date(msg.createdAt).toLocaleTimeString()}</small>
+            </div>
+          </div>
+        ))}
+        <div ref={messagesEndRef} />
       </div>
-    )}
-  </div>
 
-      <form className="chat-input-container" onSubmit={sendMessage}>
-        <input 
-          className="chat-input" 
-          value={text} 
-          onChange={e => setText(e.target.value)} 
-          placeholder="Type your message..." 
-          disabled={!adminId}
+      <form onSubmit={sendMessage} className="chat-input">
+        <input
+          value={text}
+          onChange={(e) => setText(e.target.value)}
+          placeholder="Type message..."
+          disabled={!currentReceiverId}
         />
-        <button type="submit" className="send-btn" disabled={!text.trim() || !adminId}>
+        <button type="submit" disabled={!text.trim() || !currentReceiverId}>
           Send
         </button>
-        <button type="button" className="send-btn" onClick={askAI} disabled={aiLoading || !adminId}>
-          {aiLoading ? '...' : '🤖 AI'}
-        </button>
       </form>
+
+      <style jsx>{`
+        .chat-container { max-width: 600px; margin: 0 auto; height: 70vh; display: flex; flex-direction: column; }
+        .chat-header { background: #667eea; color: white; padding: 1rem; text-align: center; }
+        .chat-messages { flex: 1; overflow-y: auto; padding: 1rem; background: #f5f5f5; }
+        .message { margin-bottom: 1rem; }
+        .message.sent { text-align: right; }
+        .message .message-content { display: inline-block; max-width: 80%; padding: 0.75rem 1rem; border-radius: 18px; }
+        .sent .message-content { background: #667eea; color: white; }
+        .received .message-content { background: white; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+        .chat-input { display: flex; padding: 1rem; gap: 0.5rem; background: white; border-top: 1px solid #eee; }
+        .chat-input input { flex: 1; padding: 0.75rem; border: 1px solid #ddd; border-radius: 20px; }
+        .chat-input button { padding: 0.75rem 1.5rem; background: #28a745; color: white; border: none; border-radius: 20px; cursor: pointer; }
+        @media (max-width: 768px) { .chat-container { height: 60vh; } }
+      `}</style>
     </div>
   );
-}
+};
+
+export default Chat;
 

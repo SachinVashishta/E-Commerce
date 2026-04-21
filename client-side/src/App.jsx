@@ -10,6 +10,7 @@ import Login from './page/Login';
 import Profile from './page/Profile';
 import AdminPanel from './page/AdminPanel';
 import ChatPage from './page/ChatPage';
+import Chat from './components/Chat';
 function App() {
   return (
     <AuthProvider>
@@ -24,7 +25,11 @@ function App() {
               <Route path="/login" element={<Login />} />
               <Route path="/profile" element={<Profile />} />
               <Route path="/admin" element={<AdminPanel />} />
-              <Route path="/chat-admin" element={ <ChatPage/>} />
+<Route path="/chat" element={<Chat/>} />
+              <Route path="/chat/:userId" element={<ChatPage />} />
+<Route path="/ai" element={<AIChat />} />
+
+
             </Routes>
           </div>
         </Router>

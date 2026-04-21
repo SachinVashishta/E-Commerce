@@ -200,7 +200,7 @@ const AdminPanel = () => {
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {users.map(u => (
-            <div key={u._id} className="user-item">
+            <div key={u._id} className="user-item" style={{ cursor: 'pointer' }} onClick={() => window.location.href = `/chat/${u._id}`}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
                 <div style={{ width: '50px', height: '50px', background: '#667eea', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontWeight: 'bold', fontSize: '1.2rem' }}>
                   {u.email[0].toUpperCase()}
@@ -214,6 +214,7 @@ const AdminPanel = () => {
               </span>
             </div>
           ))}
+
         </div>
       </div>
 
@@ -223,8 +224,8 @@ const AdminPanel = () => {
           <h2 className="text-2xl font-bold">💬 Live Chats ({recentChats.length})</h2>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {recentChats.map(chat => (
-            <div key={chat._id} className="chat-item">
+{recentChats.map(chat => (
+            <div key={chat._id} className="chat-item" style={{ cursor: 'pointer' }} onClick={() => window.location.href = `/chat/${chat._id}`}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
                 <div style={{ width: '50px', height: '50px', background: '#4f46e5', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontWeight: 'bold', fontSize: '1.2rem' }}>
                   {chat.user?.email?.[0]?.toUpperCase() || 'U'}
@@ -237,9 +238,9 @@ const AdminPanel = () => {
               <div style={{ marginTop: '0.5rem', fontSize: '0.9rem', color: '#666' }}>
                 {chat.lastMessage?.substring(0, 50)}...
               </div>
-              Last msg: {chat.lastMessage?.substring(0, 50)}...
             </div>
           ))}
+
         </div>
       </div>
 
