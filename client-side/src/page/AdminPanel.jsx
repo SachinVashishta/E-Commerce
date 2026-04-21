@@ -29,7 +29,7 @@ const AdminPanel = () => {
   useEffect(() => {
     if (user?.role === 'admin') {
       fetchAdminData();
-      fetchRecentChats();
+    
     }
   }, [user]);
 
