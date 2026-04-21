@@ -6,7 +6,17 @@ import './Chat.css';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
-export default function Chat() {\n  const { user } = useAuth();\n  const [messages, setMessages] = useState([]);\n  const [text, setText] = useState("");\n  const [loading, setLoading] = useState(false);\n  const [adminId, setAdminId] = useState(null);\n  const [targetUserId, setTargetUserId] = useState(null);\n  const [chattingWith, setChattingWith] = useState('Admin & AI');\n  const [aiLoading, setAiLoading] = useState(false);\n  const socketRef = useRef(null);\n  const userId = user?._id;\n\n  // Parse URL for admin chat with specific user\n  useEffect(() => {\n    const urlParams = new URLSearchParams(window.location.search);\n    const targetId = urlParams.get('userId');\n    if (targetId && user?.role === 'admin') {\n      setTargetUserId(targetId);\n      setChattingWith('User Chat');\n    }\n  }, []);
+export default function Chat() {
+    const { user } = useAuth();
+      const [messages, setMessages] = useState([]);
+      const [text, setText] = useState("");
+      const [loading, setLoading] = useState(false);
+      const [adminId, setAdminId] = useState(null);
+      const [targetUserId, setTargetUserId] = useState(null);
+      const [chattingWith, setChattingWith] = useState('Admin & AI');
+      const [aiLoading, setAiLoading] = useState(false);
+      const socketRef = useRef(null);
+      const userId = user?._id;  // Parse URL for admin chat with specific user\n  useEffect(() => {\n    const urlParams = new URLSearchParams(window.location.search);\n    const targetId = urlParams.get('userId');\n    if (targetId && user?.role === 'admin') {\n      setTargetUserId(targetId);\n      setChattingWith('User Chat');\n    }\n  }, []);
 
   // 1. Get admin ID
   useEffect(() => {
