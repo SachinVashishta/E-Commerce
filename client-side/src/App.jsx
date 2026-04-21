@@ -28,10 +28,10 @@ function App() {
               <Route path="/login" element={<Login />} />
               <Route path="/profile" element={<Profile />} />
               <Route path="/admin" element={<AdminPanel />} />
-              <Route path="/chat" element={<UserChat />} />
-            <Route path="/chat1" element={<Chat />} />
-              <Route path="/admin-chat/:userId" element={<AdminChat />} />
+              <Route path="/chat" element={<SimpleChat />} />
+              <Route path="/admin-chat/:userId" element={<SimpleChat />} />
               <Route path="/ai" element={<AIChat />} />
+
 
 
 

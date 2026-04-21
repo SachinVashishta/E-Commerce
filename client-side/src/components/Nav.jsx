@@ -60,7 +60,9 @@ const Nav = () => {
           
         {user ? (
             <>
-              <Link to="/chat">💬 Chat</Link>
+<Link to="/chat">💬 Chat</Link>
+              <Link to="/ai">🤖 AI</Link>
+
               <Link to="/profile">👤 Profile</Link>
               {user.role === 'admin' && <Link to="/admin">⚙️ Admin</Link>}
             </>
