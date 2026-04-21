@@ -20,39 +20,8 @@ const Profile = () => {
     }
   }, [user]);
 
-  // Profile chat: Get admin ID
-  useEffect(() => {
-    if (!userId) return;
-    axios.get(`${API_URL}/api/users/admin-id`)
-      .then(res => setAdminId(res.data.adminId))
-      .catch(err => console.error("Admin ID error", err));
-  }, [userId]);
-
-
-
-  // Load profile chat history
-  useEffect(() => {
-    if (!userId || !adminId) return;
-    setChatLoading(true);
-    axios.get(`${API_URL}/api/messages/profile/${userId}`)
-      .then(res => setChatMessages(res.data || []))
-      .catch(err => console.error("Load chat error:", err))
-      .finally(() => setChatLoading(false));
-  }, [userId, adminId]);
-
-  const sendProfileMessage = async (e) => {
-    e.preventDefault();
-    if (!chatText.trim() || !userId || !adminId) return;
-    const messageData = {
-      senderId: userId,
-      receiverId: adminId,
-      message: chatText.trim()
-    };
-    socketRef.current.emit("sendMessage", messageData);
-    setChatText("");
-  };
-
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+
 
   const fetchProfile = async () => {
     try {
