@@ -12,6 +12,7 @@ import AdminPanel from './page/AdminPanel';
 import UserChat from './page/UserChat';
 import AdminChat from './page/AdminChat';
 import AIChat from './page/AIChat';
+import Chat from './components/Chat';
 
 function App() {
   return (
@@ -28,7 +29,7 @@ function App() {
               <Route path="/profile" element={<Profile />} />
               <Route path="/admin" element={<AdminPanel />} />
               <Route path="/chat" element={<UserChat />} />
-            
+            <Route path="/chat1" element={<Chat />} />
               <Route path="/admin-chat/:userId" element={<AdminChat />} />
               <Route path="/ai" element={<AIChat />} />
 
