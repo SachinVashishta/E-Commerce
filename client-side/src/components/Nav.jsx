@@ -86,7 +86,7 @@ const Nav = () => {
         {user ? (
           <>
             <Link to="/profile" onClick={closeMenu}>👤 Profile</Link>
-            <Link to="//admin-chat/:userId" onClick={closeMenu}>💬 Chat</Link>
+            <Link to="/admin-chat/:userId" onClick={closeMenu}>💬 Chat</Link>
             {user.role === 'admin' && <Link to="/admin" onClick={closeMenu}>⚙️ Admin</Link>}
 
           </>
