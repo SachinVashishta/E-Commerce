@@ -35,7 +35,7 @@ module.exports = (io) => {
         const userMessage = await Message.create({
           senderId,
           receiverId,
-          text: cleanText
+message: cleanText
         });
 
         // Send back to sender
@@ -50,10 +50,13 @@ module.exports = (io) => {
         // ✅ AI auto-reply (simple, non-admin only)
         if (senderId !== "admin") {
           const aiText = await generateAIResponse(cleanText);
+          const admin = await User.findOne({ role: "admin" });
+                    if (!admin) return;
+                    
           const aiMessage = await Message.create({
-            senderId: "admin",
-            receiverId: senderId,
-            text: aiText
+            senderId: admin._id,
+             receiverId: senderId,
+              message: aiText
           });
 
           socket.emit("receiveMessage", aiMessage);
