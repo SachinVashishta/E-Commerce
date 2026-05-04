@@ -5,8 +5,8 @@ Status: 🔄 In Progress
 ## Steps:
 
 - [✅] 1. Fix PaymentModal: Add explicit auth header to axios call
-- [ ] 2. Verify API_URL includes '/api' prefix
-- [ ] 3. Test payment flow, check Network tab
+- [✅] 2. Verify API_URL includes '/api' prefix
+- [✅] 3. Test payment flow, check Network tab (production URL fixed)
 - [ ] 4. Verify order appears in Profile
 - [ ] 5. Complete ✅
 
