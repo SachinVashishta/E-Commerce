@@ -30,6 +30,7 @@ const ProductCard = ({ product }) => {
 
   return (
     <>
+     <div className="amazon-product-card">
     <div className="amazon-product-card" onClick={() => navigate(`/product/${product._id}`)}>
       <div className="card-image-section">
         <img src={product.image} alt={product.title} className="card-main-image" />
@@ -77,6 +78,7 @@ const ProductCard = ({ product }) => {
             Add to Cart
           </button>
         )}
+      </div>
       </div>
     </>
     
