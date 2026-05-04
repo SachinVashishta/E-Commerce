@@ -1,13 +1,16 @@
-# Local Development Setup for MERN Ecommerce App
+# Payment Fix - Order POST Error
 
-## Steps to Complete:
+Status: 🔄 In Progress
 
-- [ ] Step 1: Check/Start MongoDB local server on port 27017
-- [ ] Step 2: Install backend dependencies (server-side)
-- [ ] Step 3: Start backend server (port 5000)
-- [ ] Step 4: Install frontend dependencies (client-side)
-- [ ] Step 5: Start frontend dev server (port 5173)
-- [ ] Step 6: Test new pages at http://localhost:5173
-- [ ] Step 7: (Optional) Seed products if needed
+## Steps:
 
-**Progress: 0/7 complete**
+- [✅] 1. Fix PaymentModal: Add explicit auth header to axios call
+- [ ] 2. Verify API_URL includes '/api' prefix
+- [ ] 3. Test payment flow, check Network tab
+- [ ] 4. Verify order appears in Profile
+- [ ] 5. Complete ✅
+
+## Root Cause
+
+Frontend `POST ${API_URL}/orders` missing `Authorization: Bearer token`
+Backend requires `protect` middleware on `/api/orders`

@@ -3,20 +3,26 @@ import axios from 'axios';
 import { useCart } from '../context/CardContext';
 import { useAuth } from '../context/AuthContext';
 
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+
 const PaymentModal = ({ isOpen, onClose }) => {
   const [loading, setLoading] = useState(false);
   const { cartItems, clearCart, getTotalPrice } = useCart();
   const { user } = useAuth();
 
-const API_URL = import.meta.env.VITE_API_URL;
-
   const handlePayment = async () => {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      alert('Please login to make payment');
+      onClose();
+      return;
+    }
+
     setLoading(true);
     try {
       // Fake Razorpay delay
       await new Promise(resolve => setTimeout(resolve, 2000));
       
-      // Save order
       const orderData = {
         items: cartItems.map(item => ({
           title: item.title,
@@ -28,18 +34,24 @@ const API_URL = import.meta.env.VITE_API_URL;
         total: getTotalPrice()
       };
       
-      await axios.post(`${API_URL}/orders`, orderData);
+      const response = await axios.post(`${API_URL}/orders`, orderData, {
+        headers: { 
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      });
       
+      console.log('✅ Order created:', response.data);
       alert('🎉 Payment Successful! Order placed.');
       clearCart();
       onClose();
     } catch (error) {
-      alert('Payment failed. Please try again.');
+      console.error('❌ Payment error:', error.response?.data || error.message);
+      alert(`Payment failed: ${error.response?.data?.message || 'Please try again'}`);
     } finally {
       setLoading(false);
     }
   };
-
 
   if (!isOpen) return null;
 
@@ -62,7 +74,7 @@ const API_URL = import.meta.env.VITE_API_URL;
         boxShadow: '0 20px 60px rgba(0,0,0,0.3)'
       }}>
         <h2>💳 Secure Payment</h2>
-Total: <strong>₹{getTotalPrice().toFixed(2)}</strong>
+        <p>Total: <strong>₹{getTotalPrice().toFixed(2)}</strong></p>
         <div style={{ margin: '1rem 0' }}>
           <div style={{ fontSize: '2rem', margin: '1rem 0' }}>🔒</div>
           <p>Razorpay - Safe & Secure</p>
