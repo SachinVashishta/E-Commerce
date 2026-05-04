@@ -34,7 +34,7 @@ const PaymentModal = ({ isOpen, onClose }) => {
         total: getTotalPrice()
       };
       
-      const response = await axios.post(`${API_URL}/orders`, orderData, {
+      const response = await axios.post(`${API_URL}/api/orders`, orderData, {
         headers: { 
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
