@@ -1,13 +1,13 @@
-# Cart Navigation Fix
+# Cart Navigation Fix - TODO Steps
 
-## Issue: "Go to Cart" navigates to Product Details not Cart
+## Plan Breakdown
 
-**Root Cause:** Card has `onClick={() => navigate('/product/${id}')}` on entire container  
-**"Go to Cart" Link blocked by parent onClick**
+✅ **Step 1**: Create TODO-CartFix.md with steps  
+✅ **Step 2**: Edit ProductCard.jsx to fix "Go To Cart" event bubbling
 
-**Plan:**
+## Remaining Steps
 
-1. [ ] Fix ProductCard.jsx: Prevent event bubbling on cart button
-2. [ ] Test navigation to /cart ✓
+- **Step 3**: Test navigation (add item → click Go To Cart → verify /cart loads)
+- **Step 4**: Complete task with attempt_completion
 
-**Status:** Ready to fix
+_Updated: 1/4 steps complete_

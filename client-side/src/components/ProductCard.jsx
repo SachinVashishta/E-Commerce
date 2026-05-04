@@ -66,7 +66,7 @@ const ProductCard = ({ product }) => {
       <div className="card-actions">
         
          {inCart ? (
-             <Link to='/cart' onClick={()=> navigate('/cart')} className="add-cart-btn" style={{textDecoration:'none'}} >
+<Link to='/cart' onClick={(e) => { e.preventDefault(); e.stopPropagation(); navigate('/cart'); }} className="add-cart-btn" style={{textDecoration:'none'}} >
             Go To Cart
           </Link>
           ):(
