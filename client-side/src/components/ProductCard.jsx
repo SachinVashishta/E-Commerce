@@ -29,6 +29,7 @@ const ProductCard = ({ product }) => {
   const savings = product.originalPrice ? Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100) : 0;
 
   return (
+    <>
     <div className="amazon-product-card" onClick={() => navigate(`/product/${product._id}`)}>
       <div className="card-image-section">
         <img src={product.image} alt={product.title} className="card-main-image" />
@@ -63,10 +64,12 @@ const ProductCard = ({ product }) => {
         {savings > 0 && <span className="savings-badge">{savings}% off</span>}
       </div>
 
-      <div className="card-actions">
+     
+    </div>
+     <div className="card-actions">
         
          {inCart ? (
-<Link to='/cart' onClick={(e) => { e.preventDefault(); e.stopPropagation(); navigate('/cart'); }} className="add-cart-btn" style={{textDecoration:'none'}} >
+          <Link to='/cart' className="add-cart-btn" style={{textDecoration:'none'}} >
             Go To Cart
           </Link>
           ):(
@@ -75,7 +78,8 @@ const ProductCard = ({ product }) => {
           </button>
         )}
       </div>
-    </div>
+    </>
+    
   );
 };
 

@@ -7,7 +7,6 @@
 
 ## Remaining Steps
 
-- **Step 3**: Test navigation (add item → click Go To Cart → verify /cart loads)
 - **Step 4**: Complete task with attempt_completion
 
-_Updated: 1/4 steps complete_
+_Updated: 3/4 steps complete_
